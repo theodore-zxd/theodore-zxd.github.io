@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="关于前端与设计、黑客与画家 | 黄玄，Web & Mobile Lover，Software Engineer，UX Designer | 这里是 @Hux黄玄 的个人博客，与你一起发现更大的世界。">
+    <meta name="keywords"  content="黄玄, Hux黄玄, Hux, 鬼栈, huxpro, @huxpro, 黄玄的博客, Hux Blog, 博客, 个人网站, 互联网, Web, JavaScript, 前端, 设计">
+    <meta name="theme-color" content="#000000">
+    
+    <title>深度学习上手 - 黄玄的博客 | Hux Blog</title>
+
+    <!-- Web App Manifest -->
+    <link rel="manifest" href="/pwa/manifest.json">
+
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="/img/favicon.ico">
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="http://localhost:4000/2019/03/20/dncnn_matlab/">
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/hux-blog.min.css">
+
+    <!-- Pygments Github CSS -->
+    <link rel="stylesheet" href="/css/syntax.css">
+
+    <!-- Custom Fonts -->
+    <!-- <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"> -->
+    <!-- Hux change font-awesome CDN to qiniu -->
+    <link href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+
+    <!-- Hux Delete, sad but pending in China
+    <link href='http://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/
+    css'>
+    -->
+
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- ga & ba script hoook -->
+    <script></script>
+</head>
+
+
+<!-- hack iOS CSS :active style -->
+<body ontouchstart="">
+
+    <!-- Navigation -->
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">Hux Blog</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div id="huxblog_navbar">
+            <div class="navbar-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="/">Home</a>
+                    </li>
+                    
+                    <li>
+                        <a href="/about/">About</a>
+                    </li>
+                    
+                    <li>
+                        <a href="/portfolio/">Portfolio</a>
+                    </li>
+                    
+                    <li>
+                        <a href="/tags/">Tags</a>
+                    </li>
+                    
+                </ul>
+            </div>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+<script>
+    // Drop Bootstarp low-performance Navbar
+    // Use customize navbar with high-quality material design animation
+    // in high-perf jank-free CSS3 implementation
+    var $body   = document.body;
+    var $toggle = document.querySelector('.navbar-toggle');
+    var $navbar = document.querySelector('#huxblog_navbar');
+    var $collapse = document.querySelector('.navbar-collapse');
+
+    var __HuxNav__ = {
+        close: function(){
+            $navbar.className = " ";
+            // wait until animation end.
+            setTimeout(function(){
+                // prevent frequently toggle
+                if($navbar.className.indexOf('in') < 0) {
+                    $collapse.style.height = "0px"
+                }
+            },400)
+        },
+        open: function(){
+            $collapse.style.height = "auto"
+            $navbar.className += " in";
+        }
+    }
+
+    // Bind Event
+    $toggle.addEventListener('click', function(e){
+        if ($navbar.className.indexOf('in') > 0) {
+            __HuxNav__.close()
+        }else{
+            __HuxNav__.open()
+        }
+    })
+
+    /**
+     * Since Fastclick is used to delegate 'touchstart' globally
+     * to hack 300ms delay in iOS by performing a fake 'click',
+     * Using 'e.stopPropagation' to stop 'touchstart' event from 
+     * $toggle/$collapse will break global delegation.
+     * 
+     * Instead, we use a 'e.target' filter to prevent handler
+     * added to document close HuxNav.  
+     *
+     * Also, we use 'click' instead of 'touchstart' as compromise
+     */
+    document.addEventListener('click', function(e){
+        if(e.target == $toggle) return;
+        if(e.target.className == 'icon-bar') return;
+        __HuxNav__.close();
+    })
+</script>
+
+
+    <!-- Image to hack wechat -->
+<!-- <img src="/img/icon_wechat.png" width="0" height="0"> -->
+<!-- <img src="/img/post-bg-2015.jpg" width="0" height="0"> -->
+
+<!-- Post Header -->
+<style type="text/css">
+    header.intro-header{
+        position: relative;
+        background-image: url('/img/post-bg-2015.jpg')
+    }
+
+    
+</style>
+<header class="intro-header" >
+    <div class="header-mask"></div>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="post-heading">
+                    <div class="tags">
+                        
+                        <a class="tag" href="/tags/#CNN" title="CNN">CNN</a>
+                        
+                        <a class="tag" href="/tags/#深度学习" title="深度学习">深度学习</a>
+                        
+                        <a class="tag" href="/tags/#图像去噪" title="图像去噪">图像去噪</a>
+                        
+                    </div>
+                    <h1>深度学习上手</h1>
+                    
+                    
+                    <h2 class="subheading"> "搭建DnCNN网络进行图像去噪"</h2>
+                    
+                    <span class="meta">Posted by Xudong on March 20, 2019</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+
+    <!-- Post Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                post-container">
+
+                <!-- Multi-Lingual -->
+                
+
+				<h2 id="前言">前言</h2>
+<p>根据本人多年来从事算法研究的经验，学习一个或者一类算法最快速的方法就是<strong>实践</strong>。这种“先动手后动脑”的学习模式，往往能带来高效的学习效率。本文就从搭建一种典型的深度学习网络入手，让大家快速入门机器学习算法研究领域。</p>
+
+<p>图像处理是机器学习算法应用最为广泛的领域之一，而<strong>图像去噪</strong>任务是其中较为基础且重要的一种应用，如下图所示。<strong>卷积神经网络</strong>（<strong>CNN</strong>, 深度学习方法的一种）拥有很高的去噪性能，这里我们就搭建一种称为<a href="https://github.com/cszn/DnCNN">DnCNN</a> [1]的去噪神经网络。读者可以借此机会体验和理解CNN，图像去噪和深度学习等方法机理。
+以下是相对路径
+<img src="/img/in-post/dncnn/fig1.png" alt="" /></p>
+
+<h2 id="硬件和系统要求">硬件和系统要求</h2>
+<ol>
+  <li>由于此网络训练和应用过程都会使用到显卡，确保自己电脑拥有块不错性能的独立显卡。另外显卡品牌只能是<strong>NVIDIA</strong>，经过测试性能优于NVIDIA GeForce MX150的显卡即可。</li>
+  <li><strong>WIN10</strong>系统（本文挑选了一种可以在较为常用的windows系统下运行的网络作为入门，但是大部分深度学习算法都会选择在LINUX系统下搭建，本博客后续的文章也将会以LINUX系统中的算法为主）</li>
+</ol>
+
+<h2 id="开始搭建环境">开始搭建环境</h2>
+
+<p>环境搭建时请注意各个软件的版本号，版本对不上的话有时会遇到难以解释的bug。配置环境对于很多算法来说是比较麻烦又不可绕过的一坎。配置过程中我们应该时刻保持警惕，弄错一个步骤就会导致功亏一篑，最后再次重装系统，重头再来。</p>
+
+<h3 id="1-安装cuda91">1. 安装CUDA9.1</h3>
+
+<p>CUDA是NVIDIA公司开发的显卡驱动工具包，凡是使用GPU并行加速的程序都依赖这个驱动，深度学习也不例外。安装包下载链接：https://developer.nvidia.com/cuda-91-download-archive?target_os=Windows&amp;target_arch=x86_64</p>
+
+<p>参考图中的选项，再点击下载安装包，然后安装。</p>
+
+<p><img src="/img/in-post/dncnn/fig2.png" alt="" /></p>
+
+<h3 id="2-安装cudnn">2. 安装cuDNN</h3>
+
+<p>cuDNN是用于深度神经网络的GPU加速库，它可以被看做是一个依附于CUDA上的一个额外的库。一般来说，这两者结合才能满足深度学习网络的驱动需求。下载链接：https://developer.nvidia.com/rdp/cudnn-archive，注意要选择与CUDA配对的版本，如下图所示。</p>
+
+<p><img src="/img/in-post/dncnn/fig3.png" alt="" /></p>
+
+<p>cuDNN的安装是以打补丁的方式，主要是3步：</p>
+
+<p>（1）复制CUDA安装目录下<installpath>\cuda\bin\cudnn64_7.dll 文件至 C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v9.0\bin文件夹下</installpath></p>
+
+<p>（2）复制CUDA安装目录下<installpath>\cuda\ include\cudnn.h 文件至 C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v9.0\include文件夹下</installpath></p>
+
+<p>（3）复制CUDA安装目录下<installpath>\cuda\lib\x64\cudnn.lib文件至C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v9.0\lib\x64文件夹下</installpath></p>
+
+<p>（4）复制完成后，原先完整的cuDNN安装包存下来不要删除，后面步骤还需要使用。</p>
+
+<h3 id="3-安装visual-studio-2015">3. 安装VISUAL STUDIO 2015</h3>
+
+<p>VS就不用介绍了，可以说是windows下宇宙第一编译器。这里我们使用2015版，community版本就可以了，无需破解。</p>
+
+<p>下载地址：https://visualstudio.microsoft.com/zh-hans/vs/older-downloads/?rr=https%3A%2F%2Fwww.baidu.com%2Flink%3Furl%3D2bJ7RUd1X4L6JArIAU13JVQE-FnrHi5jiu-uzEPUCljNXw5rp37OH-HtIzKoBs5AJ-mOSQRLfz9rOxjWx_Soha%26wd%3D%26eqid%3Da5636d210001544a000000045c923f05</p>
+
+<p>安装完VS还需要安装配套的C++编译器。打开刚才安装的VS2015，新建项目，安装适用于windows桌面的C++工具，如下图所示。</p>
+
+<p><img src="/img/in-post/dncnn/fig4.png" alt="" /></p>
+
+<h3 id="4-安装matlab-2017a">4. 安装MATLAB 2017a</h3>
+
+<p>注意MATLAB的版本号哦，2016版的我也曾经试过，可行，但是其他版本就不敢保证了。最好是按照本教程选择2017a的MATLAB。由于这一步的安装涉及到破解，因此下载链接可能随时会失效。这里就请读者自行查找靠谱的下载链接了，并且自己破解了。</p>
+
+<h3 id="5-matconvnet安装">5. MatConvNet安装</h3>
+
+<p>敲黑板！注意这里是环境搭建的最重要的一步，也是比较复杂的一步，务必打起精神。</p>
+
+<p>MatConvNet是MATLAB的一个官方定制的工具盒，用来处理卷积神经网络的搭建和使用。它的官方网址是：http://www.vlfeat.org/matconvnet/，上面找到下载链接（版本号：matconvnet-1.0-beta25），下载压缩包。具体安装步骤如下：</p>
+
+<p>（1）<strong>解压</strong>：将压缩包中的MatConvNet解压到某个目录下（解压在C盘的某些文件夹下会有权限问题，建议解压在其他盘，或者桌面上，教程上我们就示范解压在桌面上）。将MATLAB的工作路径置于所解压的文件夹下的matlab文件夹中，如下图。</p>
+
+<p><img src="/img/in-post/dncnn/fig5.png" alt="" /></p>
+
+<p>（2）<strong>设置</strong>：由于MatConNet有部分涉及C++语言编写的代码，因此需要配置MATLAB兼容C++的交叉编译，输入以下命令：</p>
+
+<blockquote>
+  <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&gt; mex -setup C++
+</code></pre></div>  </div>
+
+  <p>运行结果如下图所示。</p>
+</blockquote>
+
+<p><img src="/img/in-post/dncnn/fig6.png" alt="" /></p>
+
+<p>（3）<strong>复制</strong>：之前提到的存下来的cuDNN完整安装包，这里要派上用处啦，因为MatConvNet的安装需要依赖cuDNN。将整个cuDNN文件夹放置在MATLAB安装目录下，如下图。</p>
+
+<p><img src="/img/in-post/dncnn/fig7.png" alt="" /></p>
+
+<p>（4）<strong>编译</strong>：最后输入以下命令完成MatConvNet的编译。</p>
+
+<div class="language-matlab highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">&gt;</span> <span class="n">vl_compilenn</span><span class="p">(</span><span class="s1">'enableGpu'</span><span class="p">,</span> <span class="nb">true</span><span class="p">,</span> <span class="k">...</span>
+               <span class="s1">'cudaRoot'</span><span class="p">,</span> <span class="s1">'C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v9.1'</span><span class="p">,</span> <span class="k">...</span>
+               <span class="s1">'cudaMethod'</span><span class="p">,</span> <span class="s1">'nvcc'</span><span class="p">,</span> <span class="k">...</span>
+               <span class="s1">'enableCudnn'</span><span class="p">,</span> <span class="nb">true</span><span class="p">,</span> <span class="k">...</span>
+               <span class="s1">'cudnnRoot'</span><span class="p">,</span> <span class="s1">'C:\Program Files\MATLAB\cudnn'</span><span class="p">)</span> <span class="p">;</span>
+</code></pre></div></div>
+
+<p>上面cudaRoot是安装的CUDA的文件目录，cudnnRoot是上一步复制的文件目录，可以根据自己安装情况进行修改。然后出现以下提示就是成功完成安装了。</p>
+
+<p><img src="/img/in-post/dncnn/fig8.png" alt="" /></p>
+
+<p><strong>注意：之后每次打开MATLAB都需要进入…/matconvnet/matlab的目录下，运行上述编译代码，然后才能使用整个CNN工具箱进行深度学习研究。</strong></p>
+
+<p>（5）<strong>验证</strong>：在MATLAB命令行输入以下命令，测试之前几部的安装是否正确，这时你可以听听显卡呻吟的声音:</p>
+
+<div class="language-matlab highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">&gt;</span> <span class="n">vl_testnn</span><span class="p">(</span><span class="s1">'gpu'</span><span class="p">,</span> <span class="nb">true</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>测试时间比较久，耐性等待之后，大家就可以开始深度学习之旅了！兴奋地搓着小手.gif</p>
+
+<h2 id="6-运行dncnn">6. 运行DnCNN</h2>
+
+<p>首先从github上下载源码https://github.com/cszn/DnCNN，解压。将MATLAB的工作目录设为../DnCNN-master/TrainingCodes/DnCNN_TrainingCodes_DagNN_v1.1，然后运行测试脚本Demo_Test_DnCNN_DAG.m,接下来大家就能看到网络对12张测试图片的去澡效果啦。</p>
+
+<p><img src="/img/in-post/dncnn/fig9.png" alt="" /></p>
+
+<p>左图为加噪声图像，中间为原始图像，右图为去噪后图像，可以看到CNN还是比较给力的，这样的去噪效果传统方法是达不到的。</p>
+
+<p>了解深度学习的朋友都知道，重要的还是训练过程，那么这个网络怎么训练它呢？</p>
+
+<p>（1）我们将MATLAB工作目录至于…/DnCNN-master/TrainingCodes/DnCNN_TrainingCodes_v1.0/data，运行GenerateData_model_64_25_Res_Bnorm_Adam.m脚本以生成批量训练的数据对。这个脚本是将当前目录下Train400文件夹下的图像进行分批，加噪声的方式组成无噪声和有噪声的两种图像数据对，用来后续训练神经网络。</p>
+
+<p>（2）完成以后，进入上一级目录，运行Demo_Train_model_64_25_Res_Bnorm_Adam.m脚本，这时候就开始训练神经网络了。这里需要注意，有些显卡显存不够的话，训练一段时间会报错，显示“显存不够”。这时候就需要一些高端操作来解决这个问题了，比如更改神经网络的层数等等。考虑到本文篇幅问题，这些操作就不在这边细说了。测试下来GTX 1070以上的显卡还是能够胜任这个工作的。训练时间不长也不短，几个小时还是要的。</p>
+
+<p>（3）完成训练以后，在运行当前目录下的Demo_Test_model_64_25_Res_Bnorm_Adam.m脚本就能获得对新训练模型的测试结果了。</p>
+
+<p>测试过程中我们可以发现，还有很多脚本，有的却不能运行。其中的原因交给读者慢慢寻找原因啦，找原因的过程也是一个高效学习的过程。</p>
+
+<h2 id="7-总结">7. 总结</h2>
+
+<p>以上便是，在windows下搭建DnCNN的全部详细流程。希望借此机会能够让读者入门深度学习，感受到算法的魅力。之后本博客还会更新其他一些算法的搭建流程，后续还会讲解算法原理，敬请期待。</p>
+
+<hr />
+<p>参考文献：
+[1] Zhang K , Zuo W , Chen Y , et al. Beyond a Gaussian Denoiser: Residual Learning of Deep CNN for Image Denoising[J]. IEEE TRANSACTIONS ON IMAGE PROCESSING.</p>
+
+
+                <hr style="visibility: hidden;">
+
+                <ul class="pager">
+                    
+                    
+                    <li class="next">
+                        <a href="/2019/03/20/hello-2015/" data-toggle="tooltip" data-placement="top" title="Hello World! ">
+                        Next<br>
+                        <span>Hello World! </span>
+                        </a>
+                    </li>
+                    
+                </ul>
+
+
+                
+                <!-- disqus 评论框 start -->
+                <div class="comment">
+                    <div id="disqus_thread" class="disqus-thread"></div>
+                </div>
+                <!-- disqus 评论框 end -->
+                
+
+                
+            </div>  
+
+    <!-- Side Catalog Container -->
+        
+            <div class="
+                col-lg-2 col-lg-offset-0
+                visible-lg-block
+                sidebar-container
+                catalog-container">
+                <div class="side-catalog">
+                    <hr class="hidden-sm hidden-xs">
+                    <h5>
+                        <a class="catalog-toggle" href="#">CATALOG</a>
+                    </h5>
+                    <ul class="catalog-body"></ul>
+                </div>
+            </div>
+        
+
+    <!-- Sidebar Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                <!-- Featured Tags -->
+                
+                <section>
+                    <hr class="hidden-sm hidden-xs">
+                    <h5><a href="/tags/">FEATURED TAGS</a></h5>
+                    <div class="tags">
+        				
+                            
+        				
+                            
+        				
+                            
+        				
+                            
+        				
+        			</div>
+                </section>
+                
+
+                <!-- Friends Blog -->
+                
+                <hr>
+                <h5>FRIENDS</h5>
+                <ul class="list-inline">
+                    
+                        <li><a href="http://mida.re/">乱序</a></li>
+                    
+                        <li><a href="http://qianduan.guru/">前端外刊评论</a></li>
+                    
+                        <li><a href="http://lingyu.wang/">天镶的博客</a></li>
+                    
+                        <li><a href="http://hmqk1995.github.io">Luke 的自留地</a></li>
+                    
+                        <li><a href="http://ebnbin.com/">Ebn's Blog</a></li>
+                    
+                        <li><a href="http://blog.smdcn.net">SmdCn's Blog</a></li>
+                    
+                        <li><a href="https://www.ruoyaowu.com/">David's Game</a></li>
+                    
+                        <li><a href="http://dhong.co">DHong Say</a></li>
+                    
+                        <li><a href="http://ingf.github.io/">尹峰以为</a></li>
+                    
+                        <li><a href="http://xieminis.me/">解旻的博客</a></li>
+                    
+                </ul>
+                
+            </div>
+        </div>
+    </div>
+</article>
+
+
+
+
+
+
+<!-- disqus 公共JS代码 start (一个网页只需插入一次) -->
+<script type="text/javascript">
+    /* * * CONFIGURATION VARIABLES * * */
+    var disqus_shortname = "hux";
+    var disqus_identifier = "/2019/03/20/dncnn_matlab";
+    var disqus_url = "http://localhost:4000/2019/03/20/dncnn_matlab/";
+
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<!-- disqus 公共JS代码 end -->
+
+
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+<!-- anchor-js, Doc:http://bryanbraun.github.io/anchorjs/ -->
+<script>
+    async("//cdnjs.cloudflare.com/ajax/libs/anchor-js/1.1.1/anchor.min.js",function(){
+        anchors.options = {
+          visible: 'always',
+          placement: 'right',
+          icon: '#'
+        };
+        anchors.add().remove('.intro-header h1').remove('.subheading').remove('.sidebar-container h5');
+    })
+</script>
+<style>
+    /* place left on bigger screen */
+    @media all and (min-width: 800px) {
+        .anchorjs-link{
+            position: absolute;
+            left: -0.75em;
+            font-size: 1.1em;
+            margin-top : -0.1em;
+        }
+    }
+</style>
+
+
+    <!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                    
+                    
+                    <li>
+                        <a href="https://twitter.com/huxpro">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-twitter fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                    
+
+                    <!-- add Weibo, Zhihu by Hux, add target = "_blank" to <a> by Hux -->
+                    
+                    <li>
+                        <a target="_blank" href="https://www.zhihu.com/people/huxpro">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa  fa-stack-1x fa-inverse">知</i>
+                            </span>
+                        </a>
+                    </li>
+                    
+                    
+                    <li>
+                        <a target="_blank" href="http://weibo.com/huxpro">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-weibo fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                    
+
+
+                    
+                    
+                    <li>
+                        <a target="_blank" href="https://github.com/huxpro">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                    
+                    
+                </ul>
+                <p class="copyright text-muted">
+                    Copyright &copy; Hux Blog 2019
+                    <br>
+                    Theme by <a href="http://huangxuan.me">Hux</a> |
+                    <iframe
+                        style="margin-left: 2px; margin-bottom:-5px;"
+                        frameborder="0" scrolling="0" width="100px" height="20px"
+                        src="https://ghbtns.com/github-btn.html?user=huxpro&repo=huxpro.github.io&type=star&count=true" >
+                    </iframe>
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- jQuery -->
+<script src="/js/jquery.min.js "></script>
+
+<!-- Bootstrap Core JavaScript -->
+<!-- Currently, only navbar scroll-down effect at desktop still depends on this -->
+<script src="/js/bootstrap.min.js "></script>
+
+<!-- Custom Theme JavaScript -->
+<script src="/js/hux-blog.min.js "></script>
+
+<!-- Service Worker -->
+
+<script src="/js/snackbar.js "></script>
+<script src="/js/sw-registration.js "></script>
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+
+<!--
+     Because of the native support for backtick-style fenced code blocks
+     right within the Markdown is landed in Github Pages,
+     From V1.6, There is no need for Highlight.js,
+     so Huxblog drops it officially.
+
+     - https://github.com/blog/2100-github-pages-now-faster-and-simpler-with-jekyll-3-0
+     - https://help.github.com/articles/creating-and-highlighting-code-blocks/
+     - https://github.com/jneen/rouge/wiki/list-of-supported-languages-and-lexers
+-->
+<!--
+    <script>
+        async("http://cdn.bootcss.com/highlight.js/8.6/highlight.min.js", function(){
+            hljs.initHighlightingOnLoad();
+        })
+    </script>
+    <link href="http://cdn.bootcss.com/highlight.js/8.6/styles/github.min.css" rel="stylesheet">
+-->
+
+
+<!-- jquery.tagcloud.js -->
+<script>
+    // only load tagcloud.js in tag.html
+    if($('#tag_cloud').length !== 0){
+        async('/js/jquery.tagcloud.js',function(){
+            $.fn.tagcloud.defaults = {
+                //size: {start: 1, end: 1, unit: 'em'},
+                color: {start: '#bbbbee', end: '#0085a1'},
+            };
+            $('#tag_cloud a').tagcloud();
+        })
+    }
+</script>
+
+<!--fastClick.js -->
+<script>
+    async("//cdnjs.cloudflare.com/ajax/libs/fastclick/1.0.6/fastclick.min.js", function(){
+        var $nav = document.querySelector("nav");
+        if($nav) FastClick.attach($nav);
+    })
+</script>
+
+
+<!-- Google Analytics -->
+
+<script>
+    // dynamic User by Hux
+    var _gaId = 'UA-49627206-1';
+    var _gaDomain = 'huangxuan.me';
+
+    // Originial
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', _gaId, _gaDomain);
+    ga('send', 'pageview');
+</script>
+
+
+
+<!-- Baidu Tongji -->
+
+
+
+<!-- Side Catalog -->
+
+<script type="text/javascript">
+    function generateCatalog (selector) {
+
+        // interop with multilangual 
+        if () {
+            _containerSelector = 'div.post-container.active'
+        } else {
+            _containerSelector = 'div.post-container'
+        }
+
+        // init
+        var P = $(_containerSelector),a,n,t,l,i,c;
+        a = P.find('h1,h2,h3,h4,h5,h6');
+
+        // clean
+        $(selector).html('')
+
+        // appending
+        a.each(function () {
+            n = $(this).prop('tagName').toLowerCase();
+            i = "#"+$(this).prop('id');
+            t = $(this).text();
+            c = $('<a href="'+i+'" rel="nofollow">'+t+'</a>');
+            l = $('<li class="'+n+'_nav"></li>').append(c);
+            $(selector).append(l);
+        });
+        return true;
+    }
+
+    generateCatalog(".catalog-body");
+
+    // toggle side catalog
+    $(".catalog-toggle").click((function(e){
+        e.preventDefault();
+        $('.side-catalog').toggleClass("fold")
+    }))
+
+    /*
+     * Doc: https://github.com/davist11/jQuery-One-Page-Nav
+     * Fork by Hux to support padding
+     */
+    async("/js/jquery.nav.js", function () {
+        $('.catalog-body').onePageNav({
+            currentClass: "active",
+            changeHash: !1,
+            easing: "swing",
+            filter: "",
+            scrollSpeed: 700,
+            scrollOffset: 0,
+            scrollThreshold: .2,
+            begin: null,
+            end: null,
+            scrollChange: null,
+            padding: 80
+        });
+    });
+</script>
+
+
+
+<!-- Multi-Lingual -->
+
+
+
+
+<!-- Image to hack wechat -->
+<img src="/img/icon_wechat.png" width="0" height="0" />
+<!-- Migrate from head to bottom, no longer block render and still work -->
+
+</body>
+
+</html>
