@@ -5,31 +5,10 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="人工智障，机器算命">
     <meta name="keywords"  content="博客, 个人网站, 互联网, Web, AI, deep learning, image processing">
     <meta name="theme-color" content="#000000">
-    
-    <!-- Open Graph -->
-    <meta property="og:title" content="Hello World!  - 张旭东的博客 | Xudong's Blog">
-    
-    <meta property="og:type" content="article">
-    <meta property="og:description" content="
-
-">
-    
-    <meta property="article:published_time" content="2019-03-20T00:00:00Z">
-    
-    
-    <meta property="article:author" content="Xudong">
-    
-    
-    <meta property="article:tag" content="生活">
-    
-    
-    <meta property="og:image" content="http://localhost:4000/img/avatar-star.jpg">
-    <meta property="og:url" content="http://localhost:4000/2019/03/20/hello-2015/">
-    <meta property="og:site_name" content="张旭东的博客 | Xudong's Blog">
     
     <title>Hello World!  - 张旭东的博客 | Xudong's Blog</title>
 
@@ -48,10 +27,20 @@
     <!-- Custom CSS -->
     <link rel="stylesheet" href="/css/hux-blog.min.css">
 
+    <!-- Pygments Github CSS -->
+    <link rel="stylesheet" href="/css/syntax.css">
+
     <!-- Custom Fonts -->
     <!-- <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"> -->
     <!-- Hux change font-awesome CDN to qiniu -->
     <link href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+
+    <!-- Hux Delete, sad but pending in China
+    <link href='http://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/
+    css'>
+    -->
 
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
@@ -70,9 +59,7 @@
 <body ontouchstart="">
 
     <!-- Navigation -->
-
 <nav class="navbar navbar-default navbar-custom navbar-fixed-top">
-
     <div class="container-fluid">
         <!-- Brand and toggle get grouped for better mobile display -->
         <div class="navbar-header page-scroll">
@@ -93,21 +80,17 @@
                         <a href="/">Home</a>
                     </li>
                     
+                    <li>
+                        <a href="/about/">About</a>
+                    </li>
                     
-                    
-                    
-                    
-                    
-                    
-                    
-                    
+                    <li>
+                        <a href="/portfolio/">Portfolio</a>
+                    </li>
                     
                     <li>
                         <a href="/tags/">Tags</a>
                     </li>
-                    
-                    
-                    
                     
                 </ul>
             </div>
@@ -317,39 +300,36 @@
     <div class="container">
         <div class="row">
             <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
-                <!-- SNS Link -->
-                
+                <ul class="list-inline text-center">
+                    
+                    
+
+                    <!-- add Weibo, Zhihu by Hux, add target = "_blank" to <a> by Hux -->
+                    
+                    
 
 
-<ul class="list-inline text-center">
-
-
-  
-  
-  
-  
-  
-  
-  <li>
-    <a target="_blank" href="https://github.com/theodore-zxd">
-      <span class="fa-stack fa-lg">
-        <i class="fa fa-circle fa-stack-2x"></i>
-        <i class="fa fa-github fa-stack-1x fa-inverse"></i>
-      </span>
-    </a>
-  </li>
-  
-  
-</ul>
-
+                    
+                    
+                    <li>
+                        <a target="_blank" href="https://github.com/theodore-zxd">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                    
+                    
+                </ul>
                 <p class="copyright text-muted">
                     Copyright &copy; Xudong's Blog 2019
                     <br>
-                    Powered by <a href="https://theodore-zxd.github.io">Xudong's Blog</a> |
+                    Theme by <a href="http://huangxuan.me">Hux</a> |
                     <iframe
                         style="margin-left: 2px; margin-bottom:-5px;"
                         frameborder="0" scrolling="0" width="100px" height="20px"
-                        src="https://ghbtns.com/github-btn.html?user=theodore-zxd&repo=theodore-zxd.github.io&type=star&count=true" >
+                        src="https://ghbtns.com/github-btn.html?user=huxpro&repo=huxpro.github.io&type=star&count=true" >
                     </iframe>
                 </p>
             </div>
@@ -405,8 +385,19 @@
 -->
 
 
-
-
+<!-- jquery.tagcloud.js -->
+<script>
+    // only load tagcloud.js in tag.html
+    if($('#tag_cloud').length !== 0){
+        async('/js/jquery.tagcloud.js',function(){
+            $.fn.tagcloud.defaults = {
+                //size: {start: 1, end: 1, unit: 'em'},
+                color: {start: '#bbbbee', end: '#0085a1'},
+            };
+            $('#tag_cloud a').tagcloud();
+        })
+    }
+</script>
 
 <!--fastClick.js -->
 <script>
