@@ -5,8 +5,8 @@
     <description>人工智障，机器算命</description>
     <link>http://localhost:4000/</link>
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml" />
-    <pubDate>Thu, 04 Apr 2019 15:09:40 +0800</pubDate>
-    <lastBuildDate>Thu, 04 Apr 2019 15:09:40 +0800</lastBuildDate>
+    <pubDate>Thu, 04 Apr 2019 15:40:28 +0800</pubDate>
+    <lastBuildDate>Thu, 04 Apr 2019 15:40:28 +0800</lastBuildDate>
     <generator>Jekyll v3.7.4</generator>
     
       <item>
@@ -317,14 +317,14 @@ No MPI support will be enabled for TensorFlow.
 &lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;pip install tqdm &lt;span class=&quot;c&quot;&gt;#安装tqdm用于显示进度条&lt;/span&gt;
 &lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;h2 id=&quot;3-搭建csgm和dcgan&quot;&gt;3. 搭建CSGM和DCGAN&lt;/h2&gt;
-&lt;h3 id=&quot;1安装pypng和pywt&quot;&gt;（1）安装pypng和pywt&lt;/h3&gt;
+&lt;h3 id=&quot;3-搭建csgm和dcgan&quot;&gt;3. 搭建CSGM和DCGAN&lt;/h3&gt;
+&lt;h4 id=&quot;1安装pypng和pywt&quot;&gt;（1）安装pypng和pywt&lt;/h4&gt;
 &lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;rouge-gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
 2
 &lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;rouge-code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;pip install pypng &lt;span class=&quot;c&quot;&gt;#这是python处理png图像的拓展包&lt;/span&gt;
 &lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;pip install PyWavelets &lt;span class=&quot;c&quot;&gt;#这是python进行小波变换的拓展包&lt;/span&gt;
 &lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-&lt;h3 id=&quot;2下载源码&quot;&gt;（2）下载源码&lt;/h3&gt;
+&lt;h4 id=&quot;2下载源码&quot;&gt;（2）下载源码&lt;/h4&gt;
 &lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;rouge-gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
 2
 3
@@ -332,15 +332,15 @@ No MPI support will be enabled for TensorFlow.
 &lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;cd &lt;/span&gt;csgm
 &lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;git submodule update &lt;span class=&quot;nt&quot;&gt;--init&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;--recursive&lt;/span&gt;
 &lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-&lt;h3 id=&quot;3下载数据集&quot;&gt;（3）下载数据集&lt;/h3&gt;
+&lt;h4 id=&quot;3下载数据集&quot;&gt;（3）下载数据集&lt;/h4&gt;
 &lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;rouge-gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
 &lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;rouge-code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;./setup/download_data.sh
 &lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-&lt;h3 id=&quot;4下载已经训练好的模型&quot;&gt;（4）下载已经训练好的模型&lt;/h3&gt;
+&lt;h4 id=&quot;4下载已经训练好的模型&quot;&gt;（4）下载已经训练好的模型&lt;/h4&gt;
 &lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;rouge-gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
 &lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;rouge-code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;./setup/download_models.sh
 &lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-&lt;h3 id=&quot;5运行demo&quot;&gt;（5）运行demo&lt;/h3&gt;
+&lt;h4 id=&quot;5运行demo&quot;&gt;（5）运行demo&lt;/h4&gt;
 &lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;rouge-gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
 &lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;rouge-code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;./quick_scripts/celebA_superres.sh &lt;span class=&quot;s2&quot;&gt;&quot;./images/182659.jpg&quot;&lt;/span&gt;
 &lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
@@ -360,7 +360,7 @@ No MPI support will be enabled for TensorFlow.
 &lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 &lt;p&gt;我们遮住数字的一部分，完全不影响算法识别出数字的原来的样子，这样的性能在某些工业领域完全足够能够胜任。
 &lt;img src=&quot;/img/in-post/GAN/fig9.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
-&lt;h3 id=&quot;6训练&quot;&gt;（6）训练&lt;/h3&gt;
+&lt;h4 id=&quot;6训练&quot;&gt;（6）训练&lt;/h4&gt;
 &lt;p&gt;CSGM的训练代码是调用DCGAN，因此我们需要转向研究DCGAN模型。&lt;/p&gt;
 
 &lt;p&gt;（1）下载DCGAN源代码
@@ -386,7 +386,7 @@ DCGAN有很多版本的代码，这里我们选择tensorflow版本的，参考�
 &lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 &lt;p&gt;测试结果的图像输出在&lt;code class=&quot;highlighter-rouge&quot;&gt;/samples&lt;/code&gt;目录下，如下图所示。而训练的网络参数保存在&lt;code class=&quot;highlighter-rouge&quot;&gt;、checkpoint&lt;/code&gt;目录下，后面大家可以自己试下用DCGAN的训练结果去替换之前CSGM的网络参数（因为CSGM就是基于DCGAN设计的），再运行下CSGM，看看自己训练的模型输出如何。
 &lt;img src=&quot;/img/in-post/GAN/fig13.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
-&lt;h2 id=&quot;4-总结&quot;&gt;4. 总结&lt;/h2&gt;
+&lt;h2 id=&quot;总结&quot;&gt;总结&lt;/h2&gt;
 &lt;p&gt;由于篇幅问题，linux下深度学习算法初步入门就讲到这里，后面读者可以在CSGM和DCGAN的基础上，深入研究这两个算法的机理。
 此外，完成本文环境配置过程的同学一定觉得配置算法环境很麻烦，而且如果我们想切换另一套代码，换个环境，那岂不是又要重装系统，再来一遍？非也，后面的文章我们就会一起研究解决这个问题的好方法——docker，敬请关注。&lt;/p&gt;
 </description>
