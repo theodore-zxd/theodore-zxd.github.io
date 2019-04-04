@@ -5,9 +5,391 @@
     <description>人工智障，机器算命</description>
     <link>http://localhost:4000/</link>
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml" />
-    <pubDate>Tue, 02 Apr 2019 19:42:33 +0800</pubDate>
-    <lastBuildDate>Tue, 02 Apr 2019 19:42:33 +0800</lastBuildDate>
+    <pubDate>Thu, 04 Apr 2019 12:58:53 +0800</pubDate>
+    <lastBuildDate>Thu, 04 Apr 2019 12:58:53 +0800</lastBuildDate>
     <generator>Jekyll v3.7.4</generator>
+    
+      <item>
+        <title>深度学习进阶</title>
+        <description>&lt;h2 id=&quot;前言&quot;&gt;前言&lt;/h2&gt;
+&lt;p&gt;本文我们就以linux下的深度学习算法入手，从环境配置开始，感受对抗生成网络GAN的性能效果。CSGM和DCGAN是两种典型的基于GAN设计的作用于图像处理的深度学习算法，按照本文的操作流程，读者就可以完成这两个网络的环境搭建和运行。&lt;/p&gt;
+
+&lt;h2 id=&quot;硬件和系统需求&quot;&gt;硬件和系统需求&lt;/h2&gt;
+&lt;ol&gt;
+  &lt;li&gt;英伟达显卡，显卡的计算能力 &amp;gt;= 3.0，性能越高越好，查询显卡的计算能力的官方链接：&lt;a href=&quot;https://developer.nvidia.com/cuda-gpus&quot;&gt;https://developer.nvidia.com/cuda-gpus&lt;/a&gt; 。经过本人手动验证GTX 780ti以上的显卡可以确保满足需求。&lt;/li&gt;
+  &lt;li&gt;系统为Ubuntu，它是一种基于linux开发的免费开源操作系统。大部分的深度学习算法都以这个系统环境下开发为主，之后的大部分算法介绍和应用也将以这个系统环境下进行详细展开。当前业界最为广泛使用的是&lt;strong&gt;ubuntu 16.04 64位系统&lt;/strong&gt;版本，本文也将在这个版本下进行环境搭建。不熟悉ubuntu系统的同学可以先从安装系统学起，留出1~2天的入门学习时间就可以。
+    &lt;h2 id=&quot;环境搭建&quot;&gt;环境搭建&lt;/h2&gt;
+    &lt;h3 id=&quot;0-禁用集成显卡&quot;&gt;0. 禁用集成显卡&lt;/h3&gt;
+    &lt;p&gt;在开始安装之前需要提醒以下电脑是笔记本的同学，极有可能电脑是双显卡，因此需要将飞英伟达的那块显卡禁用掉才能进行以下操作。当然如果只安装了一块显卡的台式机，可以直接跳过这一步，正式开始安装环境。&lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;Nouveau是Ubuntu自带的第三方开源N卡驱动，安装NVIDIA官方驱动之前需要禁用Nouveau.
+（1）删除所有已经安装的nvidia驱动（如果系统是新装的跳过这个步骤）&lt;/p&gt;
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;rouge-gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;rouge-code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;apt-get remove nvidia&lt;span class=&quot;k&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;apt autoremove
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;（2）安装一些依赖库&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-shel&quot;&gt;$ sudo apt-get install dkms build-essential linux-headers-generic
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;（3）禁用Nouveau
+终端输入&lt;code class=&quot;highlighter-rouge&quot;&gt;sudo gedit /etc/modprobe.d/blacklist.conf&lt;/code&gt;在弹出的文本文件中增加下面几句语句&lt;/p&gt;
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;rouge-gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+2
+3
+4
+5
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;rouge-code&quot;&gt;&lt;pre&gt;blacklist nouveau
+blacklist lbm-nouveau
+options nouveau &lt;span class=&quot;nv&quot;&gt;modeset&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;0
+&lt;span class=&quot;nb&quot;&gt;alias &lt;/span&gt;nouveau off
+&lt;span class=&quot;nb&quot;&gt;alias &lt;/span&gt;lbm-nouveau off
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;然后保存并退出。继续输入&lt;/p&gt;
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;rouge-gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+2
+3
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;rouge-code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;echo &lt;/span&gt;options nouveau &lt;span class=&quot;nv&quot;&gt;modeset&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;0
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;tee &lt;span class=&quot;nt&quot;&gt;-a&lt;/span&gt; /etc/modprobe.d/nouveau-kms.conf
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;update-initramfs &lt;span class=&quot;nt&quot;&gt;-u&lt;/span&gt;
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;重启&lt;code class=&quot;highlighter-rouge&quot;&gt;$ reboot&lt;/code&gt;
+（4）通过这个命令&lt;code class=&quot;highlighter-rouge&quot;&gt;lsmod | grep nouveau&lt;/code&gt;来确认系统是否已经禁用Nouveau，如果没有任何反馈结果，说明已经禁用成功。&lt;/p&gt;
+
+&lt;h3 id=&quot;1-安装gpu版本的tensorflow&quot;&gt;1. 安装GPU版本的tensorflow&lt;/h3&gt;
+&lt;p&gt;ubuntu 16.04 系统自带python 2.7，我们可以通过在终端输入&lt;code class=&quot;highlighter-rouge&quot;&gt;python&lt;/code&gt;来验证，并且查看版本号，退出python则输入&lt;code class=&quot;highlighter-rouge&quot;&gt;exit()&lt;/code&gt;。
+&lt;strong&gt;（1）安装pip&lt;/strong&gt;
+接下来正式安装大名鼎鼎的tensorflow，选用pip安装的方式最为便捷。pip是安装python拓展软件包的一个插件，安装命令如下：&lt;/p&gt;
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;rouge-gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+2
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;rouge-code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;apt-get install python-pip python-dev &lt;span class=&quot;c&quot;&gt;#安装pip&lt;/span&gt;
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;pip install &lt;span class=&quot;nt&quot;&gt;--upgrade&lt;/span&gt; pip &lt;span class=&quot;c&quot;&gt;#更新pip&lt;/span&gt;
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;更换pip源为国内源，我们选用阿里云的源，在 &lt;code class=&quot;highlighter-rouge&quot;&gt;~/.pip/&lt;/code&gt;目录下生成配置文件：&lt;/p&gt;
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;rouge-gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+2
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;rouge-code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;mkdir ~/.pip/
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;gedit ~/.pip/pip.conf 
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;然后在弹出的文档编辑器上输入&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;rouge-gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+2
+3
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;rouge-code&quot;&gt;&lt;pre&gt;[global]
+trusted-host=mirrors.aliyun.com
+index-url=https://mirrors.aliyun.com/pypi/simple/
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;再保存，关闭。顺带这里提一句，系统的更新也建议切换至国内的源，如下图所示：
+&lt;img src=&quot;/img/in-post/GAN/fig1.png&quot; alt=&quot;&quot; /&gt;
+&lt;strong&gt;（2）安装GPU驱动&lt;/strong&gt;
+终端输入&lt;code class=&quot;highlighter-rouge&quot;&gt;sudo apt-get update&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;如下图所示在图形界面中安装显卡驱动：
+System Settings →Software &amp;amp; Updates→Additional Drivers→Nvidia Corporation→Apply Changes→重启
+&lt;img src=&quot;/img/in-post/GAN/fig2.png&quot; alt=&quot;&quot; /&gt;
+ 验证安装，终端输入&lt;code class=&quot;highlighter-rouge&quot;&gt;nvidia-settings&lt;/code&gt;，出现以下界面说明安装成功
+&lt;img src=&quot;/img/in-post/GAN/fig3.png&quot; alt=&quot;&quot; /&gt;
+&lt;strong&gt;（3）安装bazel&lt;/strong&gt;
+ bazel是Google推出的用来编译tensorflow开源工具，注意这里我们不按照官方安装教程，因为过高版本的bazel会造成后期的编译问题。首先我们在终端输入以下命令：&lt;/p&gt;
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;rouge-gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+2
+3
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;rouge-code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;add-apt-repository ppa:webupd8team/java
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;apt-get update &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;apt-get install oracle-java8-installer
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;apt-get update
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;验证完成安装JDK8&lt;code class=&quot;highlighter-rouge&quot;&gt;java -version&lt;/code&gt;会显示所安装的java编译器版本号，接下来安装bazel，首先下载bazel安装文件，链接&lt;a href=&quot;https://github.com/bazelbuild/bazel/releases?after=0.9.0&quot;&gt;https://github.com/bazelbuild/bazel/releases?after=0.9.0&lt;/a&gt; 选择&lt;code class=&quot;highlighter-rouge&quot;&gt;bazel-0.5.4-installer-linux-x86_64.sh&lt;/code&gt;下载安装脚本，然后进入下载目录&lt;code class=&quot;highlighter-rouge&quot;&gt;cd &amp;lt;installpath&amp;gt;&lt;/code&gt;进行安装&lt;/p&gt;
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;rouge-gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+2
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;rouge-code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;chmod +x bazel-0.5.4-installer-linux-x86_64.sh
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;sudo&lt;/span&gt; ./bazel-0.5.4-installer-linux-x86_64.sh
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;strong&gt;（4）安装CUDA 8.0&lt;/strong&gt;
+这里各位也要注意了，各个软件的版本好一定要对上，并非越高级的版本越有效，有时候会出现一些难以解释的问题，都是由于版本不对导致的。这里我们选择CUDA8.0 GA2版本，下载链接：&lt;a href=&quot;https://developer.nvidia.com/cuda-toolkit-archive&quot;&gt;https://developer.nvidia.com/cuda-toolkit-archive&lt;/a&gt; 按照下图步骤选择，下载deb安装文件。
+&lt;img src=&quot;/img/in-post/GAN/fig4.png&quot; alt=&quot;&quot; /&gt;
+下载完毕后，用终端进入到存放安装包的目录下&lt;code class=&quot;highlighter-rouge&quot;&gt;cd &amp;lt;installpath&amp;gt;&lt;/code&gt;，然后&lt;/p&gt;
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;rouge-gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+2
+3
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;rouge-code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;dpkg &lt;span class=&quot;nt&quot;&gt;-i&lt;/span&gt; cuda-repo-ubuntu1604-8-0-local-ga2_8.0.61-1_amd64.deb
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;apt-get update
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;apt-get install cuda
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;&lt;strong&gt;（5）安装cudnn 5.1&lt;/strong&gt;
+安装包下载地址：&lt;a href=&quot;https://developer.nvidia.com/rdp/cudnn-archive&quot;&gt;https://developer.nvidia.com/rdp/cudnn-archive&lt;/a&gt; 如下图选择&lt;code class=&quot;highlighter-rouge&quot;&gt;cuDNN v5.1 Library for Linux&lt;/code&gt;
+&lt;img src=&quot;/img/in-post/GAN/fig5.png&quot; alt=&quot;&quot; /&gt;
+下载完毕后进入下载的文件目录，解压缩，拷贝，覆盖，更新软链接&lt;/p&gt;
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;rouge-gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+2
+3
+4
+5
+6
+7
+8
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;rouge-code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;tar&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-zxvf&lt;/span&gt; cudnn-8.0-linux-x64-v5.1.tgz
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;cp cuda/include/cudnn.h /usr/local/cuda/include
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;cp cuda/lib64/libcudnn&lt;span class=&quot;k&quot;&gt;*&lt;/span&gt; /usr/local/cuda/lib64
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;chmod a+r /usr/local/cuda/include/cudnn.h /usr/local/cuda/lib64/libcudnn&lt;span class=&quot;k&quot;&gt;*&lt;/span&gt;
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;cd&lt;/span&gt; /usr/local/cuda/lib64/
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;rm &lt;span class=&quot;nt&quot;&gt;-rf&lt;/span&gt; libcudnn.so libcudnn.so.5 &lt;span class=&quot;c&quot;&gt;#删除原有动态文件&lt;/span&gt;
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;ln &lt;span class=&quot;nt&quot;&gt;-s&lt;/span&gt; libcudnn.so.5.1.5 libcudnn.so.5 &lt;span class=&quot;c&quot;&gt;#生成软衔接&lt;/span&gt;
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;ln &lt;span class=&quot;nt&quot;&gt;-s&lt;/span&gt; libcudnn.so.5 libcudnn.so &lt;span class=&quot;c&quot;&gt;#生成软链接&lt;/span&gt;
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;&lt;strong&gt;（6）配置系统环境变量&lt;/strong&gt;
+在终端中输入：&lt;/p&gt;
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;rouge-gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;rouge-code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;gedit ~/.bashrc &lt;span class=&quot;c&quot;&gt;#打开.bashrc文件&lt;/span&gt;
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;保存，并使设置立即生效，在终端中输入&lt;/p&gt;
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;rouge-gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;rouge-code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;source&lt;/span&gt; ~/.bashrc
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;重启电脑。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;（7）安装tensorflow&lt;/strong&gt;
+在此之前安装其他依赖包&lt;/p&gt;
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;rouge-gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;rouge-code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;apt-get install python-numpy python-dev python-wheel
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;下载tensorflow-1.5.0的源码，注意千万不要下载官网的代码，因为官网已经更新至tensorflow-2.0，对应的软件环境配置也会翻天覆地的变化。因此我们选用更老的版本，如&lt;strong&gt;tensorflow-1.5.0&lt;/strong&gt;，相对更加稳定，而且很多算法也是基于这样的环境编写的。&lt;/p&gt;
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;rouge-gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+2
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;rouge-code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;apt-get install git
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;git clone https://github.com/theodore-zxd/tensorflow-1.5.0-rc0.git
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;运行配置文件&lt;/p&gt;
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;rouge-gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+2
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;rouge-code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;cd &lt;/span&gt;tensorflow
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;./configure
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;接下来是一些列配置问题，其他任何问题都可以按回车使用默认值，但是在回答&lt;strong&gt;CUDA的那项一定要选择yes&lt;/strong&gt;，参考下面&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;rouge-gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;rouge-code&quot;&gt;&lt;pre&gt;Please input the desired Python library path to use.  Default is [/home/shengchun/tensorflow/models/]/usr/local/lib/python3.5/dist-packages
+Do you wish to build TensorFlow with jemalloc as malloc support? [Y/n]:[Enter]
+jemalloc as malloc support will be enabled for TensorFlow.
+
+Do you wish to build TensorFlow with Google Cloud Platform support? [Y/n]:[Enter]
+Google Cloud Platform support will be enabled for TensorFlow.
+
+Do you wish to build TensorFlow with Hadoop File System support? [Y/n]:[Enter]
+Hadoop File System support will be enabled for TensorFlow.
+
+Do you wish to build TensorFlow with XLA JIT support? [y/N]:[Enter]
+No XLA JIT support will be enabled for TensorFlow.
+
+Do you wish to build TensorFlow with GDR support? [y/N]:[Enter]
+No GDR support will be enabled for TensorFlow.
+
+Do you wish to build TensorFlow with VERBS support? [y/N]:[Enter]
+No VERBS support will be enabled for TensorFlow.
+
+Do you wish to build TensorFlow with OpenCL support? [y/N]:[Enter]
+No OpenCL support will be enabled for TensorFlow.
+
+Please specify the CUDA SDK version you want to use. [Leave empty to default to CUDA 10.0]: 8.0
+
+Please specify the location where CUDA 8.0 toolkit is installed. Refer to README.md for more details. [Default is /usr/local/cuda]: [Enter]
+
+Please specify the cuDNN version you want to use. [Leave empty to default to cuDNN 7]: 5.1.10
+
+Please specify the location where cuDNN 5 library is installed. Refer to README.md for more details. [Default is /usr/local/cuda]: [Enter]
+
+
+Do you wish to build TensorFlow with TensorRT support? [y/N]: [Enter]
+No TensorRT support will be enabled for TensorFlow.
+
+Please specify the locally installed NCCL version you want to use. [Default is to use https://github.com/nvidia/nccl]: [Enter]
+
+Please specify a list of comma-separated CUDA compute capabilities you want to build with.
+You can find the compute capability of your device at: https://developer.nvidia.com/cuda-gpus.
+Please note that each additional compute capability significantly increases your build time and binary size, and that TensorFlow only supports compute capabilities &amp;gt;= 3.5 [Default is: 6.1]: [Enter]
+
+Do you want to use clang as CUDA compiler? [y/N]:  [Enter]
+nvcc will be used as CUDA compiler.
+
+Please specify which gcc should be used by nvcc as the host compiler. [Default is /usr/bin/gcc]: [Enter]
+
+Do you wish to build TensorFlow with MPI support? [y/N]: [Enter]
+No MPI support will be enabled for TensorFlow.
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;配置完毕后开始编译，这一步耗时比较长，做好心理准备，起码一个多小时是要的：&lt;/p&gt;
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;rouge-gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+2
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;rouge-code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;bazel build &lt;span class=&quot;nt&quot;&gt;--config&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;opt //tensorflow/tools/pip_package:build_pip_package
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;./bazel-bin/tensorflow/tools/pip_package/build_pip_package ./tensorflow_pkg
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;如果上面步骤出现下面这个问题：&lt;/p&gt;
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;rouge-gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;rouge-code&quot;&gt;&lt;pre&gt;ERROR: Config value cuda is not defined &lt;span class=&quot;k&quot;&gt;in &lt;/span&gt;any .rc file
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;这个就是你之前安装的bazel版本过高导致的，所以一定要选择对应的bazel-0.5.4的版本才行。解决方法就是重新安装bazel即可，安装脚本会自动覆盖之前的版本，不需要卸载。&lt;/p&gt;
+
+&lt;p&gt;成功的话会在，在tensorflow_pkg下生成了&lt;code class=&quot;highlighter-rouge&quot;&gt;tensorflow-1.5.0rc0-cp27-cp27mu-linux_x86_64.whl&lt;/code&gt;然后进入到这个文件夹下，运行以下命令，用pip完成安装：&lt;/p&gt;
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;rouge-gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;rouge-code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;pip install tensorflow-1.5.0rc0-cp27-cp27mu-linux_x86_64.whl
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;&lt;strong&gt;（8）验证tensorflow&lt;/strong&gt;
+提示安装成功后，在命令行输入&lt;code class=&quot;highlighter-rouge&quot;&gt;python&lt;/code&gt;，运行python终端，输入以下代码：&lt;/p&gt;
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;rouge-gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+2
+3
+4
+5
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;rouge-code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;tensorflow&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;as&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;tf&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;matrix1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;tf&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;constant&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;([[&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;3.&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;3.&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]])&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;matrix2&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;tf&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;constant&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;([[&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;2.&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],[&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;2.&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]])&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;product&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;tf&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;matmul&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;matrix1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;matrix2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sess&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;tf&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Session&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;如果能够弹出本机的显卡信息，那就恭喜你已经完成了GPU版本的tensorflow的安装了。
+&lt;img src=&quot;/img/in-post/GAN/fig6.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;2-安装scipy等其他科学计算拓展包&quot;&gt;2. 安装SciPy等其他科学计算拓展包&lt;/h3&gt;
+&lt;p&gt;在终端输入以下命令来完成安装：&lt;/p&gt;
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;rouge-gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+2
+3
+4
+5
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;rouge-code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;apt-get install python-numpy python-scipy python-matplotlib ipython ipython-notebook python-pandas python-sympy python-nose
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;apt-get install python-opencv &lt;span class=&quot;c&quot;&gt;#安装python的opencv库&lt;/span&gt;
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;pip install &lt;span class=&quot;nt&quot;&gt;-U&lt;/span&gt; scikit-learn &lt;span class=&quot;c&quot;&gt;#安装机器学习python拓展包sklearn&lt;/span&gt;
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;apt-get install python-requests &lt;span class=&quot;c&quot;&gt;#安装request用于下载数据集&lt;/span&gt;
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;pip install tqdm &lt;span class=&quot;c&quot;&gt;#安装tqdm用于显示进度条&lt;/span&gt;
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;3-搭建csgm和dcgan&quot;&gt;3. 搭建CSGM和DCGAN&lt;/h2&gt;
+&lt;h3 id=&quot;1安装pypng和pywt&quot;&gt;（1）安装pypng和pywt&lt;/h3&gt;
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;rouge-gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+2
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;rouge-code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;pip install pypng &lt;span class=&quot;c&quot;&gt;#这是python处理png图像的拓展包&lt;/span&gt;
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;pip install PyWavelets &lt;span class=&quot;c&quot;&gt;#这是python进行小波变换的拓展包&lt;/span&gt;
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;h3 id=&quot;2下载源码&quot;&gt;（2）下载源码&lt;/h3&gt;
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;rouge-gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+2
+3
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;rouge-code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;git clone https://github.com/AshishBora/csgm.git
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;cd &lt;/span&gt;csgm
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;git submodule update &lt;span class=&quot;nt&quot;&gt;--init&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;--recursive&lt;/span&gt;
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;h3 id=&quot;3下载数据集&quot;&gt;（3）下载数据集&lt;/h3&gt;
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;rouge-gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;rouge-code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;./setup/download_data.sh
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;h3 id=&quot;4下载已经训练好的模型&quot;&gt;（4）下载已经训练好的模型&lt;/h3&gt;
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;rouge-gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;rouge-code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;./setup/download_models.sh
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;h3 id=&quot;5运行demo&quot;&gt;（5）运行demo&lt;/h3&gt;
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;rouge-gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;rouge-code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;./quick_scripts/celebA_superres.sh &lt;span class=&quot;s2&quot;&gt;&quot;./images/182659.jpg&quot;&lt;/span&gt;
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;这段demo实现的功能是图像超分辨率，运行结果如下图所示：
+&lt;img src=&quot;/img/in-post/GAN/fig7.png&quot; alt=&quot;&quot; /&gt;
+三张图的上图是原高分辨率图像，中间则是通过对第一张图做降低分辨率获得的低分辨率图像，最后一张是算法通过深度学习网络计算获得的高分辨率图像。它实现了将模糊的人脸变清晰的功能，但是我们发现变出的脸更原来的图像大相径庭。这也是这套算法，或者说对抗生成网络GAN的通病。&lt;/p&gt;
+
+&lt;p&gt;我们再尝试另一段demo:&lt;/p&gt;
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;rouge-gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;rouge-code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;./quick_scripts/celebA_inpaint.sh &lt;span class=&quot;s2&quot;&gt;&quot;./images/182659.jpg&quot;&lt;/span&gt;
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;这段demo完成的是inpainting的工作，也就是将原始图像挖去一块，用GAN来进行填充，这样算法就可以在某些特定的领域完成神奇的功能：）。但是我们在下图结果中可以发现，算法的性能有待改进。
+&lt;img src=&quot;/img/in-post/GAN/fig8.png&quot; alt=&quot;&quot; /&gt;
+但是对于数字来说，这样的 性能已经完全足够了，终端中输入以下命令：&lt;/p&gt;
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;rouge-gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;rouge-code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;./quick_scripts/mnist_inpaint.sh
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;我们遮住数字的一部分，完全不影响算法识别出数字的原来的样子，这样的性能在某些工业领域完全足够能够胜任。
+&lt;img src=&quot;/img/in-post/GAN/fig9.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;h3 id=&quot;6训练&quot;&gt;（6）训练&lt;/h3&gt;
+&lt;p&gt;CSGM的训练代码是调用DCGAN，因此我们需要转向研究DCGAN模型。
+（1）下载DCGAN源代码
+DCGAN有很多版本的代码，这里我们选择tensorflow版本的，参考链接为&lt;a href=&quot;https://github.com/carpedm20/DCGAN-tensorflow&quot;&gt;https://github.com/carpedm20/DCGAN-tensorflow&lt;/a&gt; 输入以下命令下载源码：&lt;/p&gt;
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;rouge-gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;rouge-code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;git clone https://github.com/carpedm20/DCGAN-tensorflow.git
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;（2）添加mnist数据集
+在DCGAN官方链接中提示我们需要在线下载数据库，但是在国内的同学使用脚本下载数据库会出现网络问题，因为google被墙了。所幸我们在上个部分CSGM中已经下载过这个数据集，只要把他们挪过来就可以使用了（&lt;strong&gt;注意mnist挪过来的时候里面的压缩包都要解压，然后每个文件的名字都需要将中间的.改成-&lt;/strong&gt;）。
+&lt;img src=&quot;/img/in-post/GAN/fig10.png&quot; alt=&quot;&quot; /&gt;
+&lt;img src=&quot;/img/in-post/GAN/fig11.png&quot; alt=&quot;&quot; /&gt;
+&lt;img src=&quot;/img/in-post/GAN/fig12.png&quot; alt=&quot;&quot; /&gt;
+（3）训练和测试
+在DCGAN根目录下的终端中输入&lt;/p&gt;
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;rouge-gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;rouge-code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;python main.py &lt;span class=&quot;nt&quot;&gt;--dataset&lt;/span&gt; mnist &lt;span class=&quot;nt&quot;&gt;--input_height&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;28 &lt;span class=&quot;nt&quot;&gt;--output_height&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;28 &lt;span class=&quot;nt&quot;&gt;--train&lt;/span&gt;
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;训练需要一些时间，并且显卡的动静很大。完成以后，输入以下指令完成测试：&lt;/p&gt;
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;rouge-gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;rouge-code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;python main.py &lt;span class=&quot;nt&quot;&gt;--dataset&lt;/span&gt; mnist &lt;span class=&quot;nt&quot;&gt;--input_height&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;28 &lt;span class=&quot;nt&quot;&gt;--output_height&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;28
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;测试结果的图像输出在&lt;code class=&quot;highlighter-rouge&quot;&gt;/samples&lt;/code&gt;目录下，如下图所示。而训练的网络参数保存在&lt;code class=&quot;highlighter-rouge&quot;&gt;、checkpoint&lt;/code&gt;目录下，后面大家可以自己试下用DCGAN的训练结果去替换之前CSGM的网络参数（因为CSGM就是基于DCGAN设计的），再运行下CSGM，看看自己训练的模型输出如何。
+&lt;img src=&quot;/img/in-post/GAN/fig13.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;h2 id=&quot;4-总结&quot;&gt;4. 总结&lt;/h2&gt;
+&lt;p&gt;由于篇幅问题，linux下深度学习算法初步入门就讲到这里，后面读者可以在CSGM和DCGAN的基础上，深入研究这两个算法的机理。
+此外，完成本文环境配置过程的同学一定觉得配置算法环境很麻烦，而且如果我们想切换另一套代码，换个环境，那岂不是又要重装系统，再来一遍？非也，后面的文章我们就会一起研究解决这个问题的好方法——docker，敬请关注。&lt;/p&gt;
+</description>
+        <pubDate>Thu, 04 Apr 2019 00:00:00 +0800</pubDate>
+        <link>http://localhost:4000/2019/04/04/GAN/</link>
+        <guid isPermaLink="true">http://localhost:4000/2019/04/04/GAN/</guid>
+        
+        <category>GAN</category>
+        
+        <category>深度学习</category>
+        
+        <category>图像处理</category>
+        
+        
+      </item>
     
       <item>
         <title>Hello World! </title>
@@ -180,7 +562,7 @@
         
         <category>深度学习</category>
         
-        <category>图像去噪</category>
+        <category>图像处理</category>
         
         
       </item>
