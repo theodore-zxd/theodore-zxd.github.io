@@ -5,8 +5,8 @@
     <description>人工智障，机器算命</description>
     <link>http://localhost:4000/</link>
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml" />
-    <pubDate>Thu, 04 Apr 2019 16:07:25 +0800</pubDate>
-    <lastBuildDate>Thu, 04 Apr 2019 16:07:25 +0800</lastBuildDate>
+    <pubDate>Thu, 04 Apr 2019 16:13:37 +0800</pubDate>
+    <lastBuildDate>Thu, 04 Apr 2019 16:13:37 +0800</lastBuildDate>
     <generator>Jekyll v3.7.4</generator>
     
       <item>
@@ -369,20 +369,23 @@ No MPI support will be enabled for TensorFlow.
 &lt;h4 id=&quot;6训练&quot;&gt;（6）训练&lt;/h4&gt;
 &lt;p&gt;CSGM的训练代码是调用DCGAN，因此我们需要转向研究DCGAN模型。&lt;/p&gt;
 
-&lt;p&gt;（1）下载DCGAN源代码
-DCGAN有很多版本的代码，这里我们选择tensorflow版本的，参考链接为&lt;a href=&quot;https://github.com/carpedm20/DCGAN-tensorflow&quot;&gt;https://github.com/carpedm20/DCGAN-tensorflow&lt;/a&gt; 输入以下命令下载源码：&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;（1）下载DCGAN源代码&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;DCGAN有很多版本的代码，这里我们选择tensorflow版本的，参考链接为&lt;a href=&quot;https://github.com/carpedm20/DCGAN-tensorflow&quot;&gt;https://github.com/carpedm20/DCGAN-tensorflow&lt;/a&gt; 输入以下命令下载源码：&lt;/p&gt;
 &lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;rouge-gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
 &lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;rouge-code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;git clone https://github.com/carpedm20/DCGAN-tensorflow.git
 &lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;p&gt;（2）添加mnist数据集
-在DCGAN官方链接中提示我们需要在线下载数据库，但是在国内的同学使用脚本下载数据库会出现网络问题，因为google被墙了。所幸我们在上个部分CSGM中已经下载过这个数据集，只要把他们挪过来就可以使用了（&lt;strong&gt;注意mnist挪过来的时候里面的压缩包都要解压，然后每个文件的名字都需要将中间的.改成-&lt;/strong&gt;）。
+&lt;p&gt;&lt;strong&gt;（2）添加mnist数据集&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;在DCGAN官方链接中提示我们需要在线下载数据库，但是在国内的同学使用脚本下载数据库会出现网络问题，因为google被墙了。所幸我们在上个部分CSGM中已经下载过这个数据集，只要把他们挪过来就可以使用了（&lt;strong&gt;注意mnist挪过来的时候里面的压缩包都要解压，然后每个文件的名字都需要将中间的.改成-&lt;/strong&gt;）。
 &lt;img src=&quot;/img/in-post/GAN/fig10.png&quot; alt=&quot;&quot; /&gt;
 &lt;img src=&quot;/img/in-post/GAN/fig11.png&quot; alt=&quot;&quot; /&gt;
 &lt;img src=&quot;/img/in-post/GAN/fig12.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 
-&lt;p&gt;（3）训练和测试
-在DCGAN根目录下的终端中输入&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;（3）训练和测试&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;在DCGAN根目录下的终端中输入&lt;/p&gt;
 &lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;rouge-gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
 &lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;rouge-code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;python main.py &lt;span class=&quot;nt&quot;&gt;--dataset&lt;/span&gt; mnist &lt;span class=&quot;nt&quot;&gt;--input_height&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;28 &lt;span class=&quot;nt&quot;&gt;--output_height&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;28 &lt;span class=&quot;nt&quot;&gt;--train&lt;/span&gt;
 &lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
@@ -393,8 +396,9 @@ DCGAN有很多版本的代码，这里我们选择tensorflow版本的，参考�
 &lt;p&gt;测试结果的图像输出在&lt;code class=&quot;highlighter-rouge&quot;&gt;/samples&lt;/code&gt;目录下，如下图所示。而训练的网络参数保存在&lt;code class=&quot;highlighter-rouge&quot;&gt;、checkpoint&lt;/code&gt;目录下，后面大家可以自己试下用DCGAN的训练结果去替换之前CSGM的网络参数（因为CSGM就是基于DCGAN设计的），再运行下CSGM，看看自己训练的模型输出如何。
 &lt;img src=&quot;/img/in-post/GAN/fig13.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 &lt;h2 id=&quot;总结&quot;&gt;总结&lt;/h2&gt;
-&lt;p&gt;由于篇幅问题，linux下深度学习算法初步入门就讲到这里，后面读者可以在CSGM和DCGAN的基础上，深入研究这两个算法的机理。
-此外，完成本文环境配置过程的同学一定觉得配置算法环境很麻烦，而且如果我们想切换另一套代码，换个环境，那岂不是又要重装系统，再来一遍？非也，后面的文章我们就会一起研究解决这个问题的好方法——docker，敬请关注。&lt;/p&gt;
+&lt;p&gt;由于篇幅问题，linux下深度学习算法初步入门就讲到这里，后面读者可以在CSGM和DCGAN的基础上，深入研究这两个算法的机理。&lt;/p&gt;
+
+&lt;p&gt;此外，完成本文环境配置过程的同学一定觉得配置算法环境很麻烦，而且如果我们想切换另一套代码，换个环境，那岂不是又要重装系统，再来一遍？非也，后面的文章我们就会一起研究解决这个问题的好方法——docker，敬请关注。&lt;/p&gt;
 </description>
         <pubDate>Thu, 04 Apr 2019 00:00:00 +0800</pubDate>
         <link>http://localhost:4000/2019/04/04/GAN/</link>

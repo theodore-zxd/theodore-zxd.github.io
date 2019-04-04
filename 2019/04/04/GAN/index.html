@@ -587,20 +587,23 @@ No MPI support will be enabled for TensorFlow.
 <h4 id="6训练">（6）训练</h4>
 <p>CSGM的训练代码是调用DCGAN，因此我们需要转向研究DCGAN模型。</p>
 
-<p>（1）下载DCGAN源代码
-DCGAN有很多版本的代码，这里我们选择tensorflow版本的，参考链接为<a href="https://github.com/carpedm20/DCGAN-tensorflow">https://github.com/carpedm20/DCGAN-tensorflow</a> 输入以下命令下载源码：</p>
+<p><strong>（1）下载DCGAN源代码</strong></p>
+
+<p>DCGAN有很多版本的代码，这里我们选择tensorflow版本的，参考链接为<a href="https://github.com/carpedm20/DCGAN-tensorflow">https://github.com/carpedm20/DCGAN-tensorflow</a> 输入以下命令下载源码：</p>
 <div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 </pre></td><td class="rouge-code"><pre><span class="nv">$ </span>git clone https://github.com/carpedm20/DCGAN-tensorflow.git
 </pre></td></tr></tbody></table></code></pre></div></div>
 
-<p>（2）添加mnist数据集
-在DCGAN官方链接中提示我们需要在线下载数据库，但是在国内的同学使用脚本下载数据库会出现网络问题，因为google被墙了。所幸我们在上个部分CSGM中已经下载过这个数据集，只要把他们挪过来就可以使用了（<strong>注意mnist挪过来的时候里面的压缩包都要解压，然后每个文件的名字都需要将中间的.改成-</strong>）。
+<p><strong>（2）添加mnist数据集</strong></p>
+
+<p>在DCGAN官方链接中提示我们需要在线下载数据库，但是在国内的同学使用脚本下载数据库会出现网络问题，因为google被墙了。所幸我们在上个部分CSGM中已经下载过这个数据集，只要把他们挪过来就可以使用了（<strong>注意mnist挪过来的时候里面的压缩包都要解压，然后每个文件的名字都需要将中间的.改成-</strong>）。
 <img src="/img/in-post/GAN/fig10.png" alt="" />
 <img src="/img/in-post/GAN/fig11.png" alt="" />
 <img src="/img/in-post/GAN/fig12.png" alt="" /></p>
 
-<p>（3）训练和测试
-在DCGAN根目录下的终端中输入</p>
+<p><strong>（3）训练和测试</strong></p>
+
+<p>在DCGAN根目录下的终端中输入</p>
 <div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 </pre></td><td class="rouge-code"><pre><span class="nv">$ </span>python main.py <span class="nt">--dataset</span> mnist <span class="nt">--input_height</span><span class="o">=</span>28 <span class="nt">--output_height</span><span class="o">=</span>28 <span class="nt">--train</span>
 </pre></td></tr></tbody></table></code></pre></div></div>
@@ -611,8 +614,9 @@ DCGAN有很多版本的代码，这里我们选择tensorflow版本的，参考�
 <p>测试结果的图像输出在<code class="highlighter-rouge">/samples</code>目录下，如下图所示。而训练的网络参数保存在<code class="highlighter-rouge">、checkpoint</code>目录下，后面大家可以自己试下用DCGAN的训练结果去替换之前CSGM的网络参数（因为CSGM就是基于DCGAN设计的），再运行下CSGM，看看自己训练的模型输出如何。
 <img src="/img/in-post/GAN/fig13.png" alt="" /></p>
 <h2 id="总结">总结</h2>
-<p>由于篇幅问题，linux下深度学习算法初步入门就讲到这里，后面读者可以在CSGM和DCGAN的基础上，深入研究这两个算法的机理。
-此外，完成本文环境配置过程的同学一定觉得配置算法环境很麻烦，而且如果我们想切换另一套代码，换个环境，那岂不是又要重装系统，再来一遍？非也，后面的文章我们就会一起研究解决这个问题的好方法——docker，敬请关注。</p>
+<p>由于篇幅问题，linux下深度学习算法初步入门就讲到这里，后面读者可以在CSGM和DCGAN的基础上，深入研究这两个算法的机理。</p>
+
+<p>此外，完成本文环境配置过程的同学一定觉得配置算法环境很麻烦，而且如果我们想切换另一套代码，换个环境，那岂不是又要重装系统，再来一遍？非也，后面的文章我们就会一起研究解决这个问题的好方法——docker，敬请关注。</p>
 
 
                 <hr style="visibility: hidden;">
