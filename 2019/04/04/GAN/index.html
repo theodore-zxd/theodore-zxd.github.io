@@ -238,18 +238,20 @@
   <li>系统为Ubuntu，它是一种基于linux开发的免费开源操作系统。大部分的深度学习算法都以这个系统环境下开发为主，之后的大部分算法介绍和应用也将以这个系统环境下进行详细展开。当前业界最为广泛使用的是<strong>ubuntu 16.04 64位系统</strong>版本，本文也将在这个版本下进行环境搭建。不熟悉ubuntu系统的同学可以先从安装系统学起，留出1~2天的入门学习时间就可以。
     <h2 id="环境搭建">环境搭建</h2>
     <h3 id="0-禁用集成显卡">0. 禁用集成显卡</h3>
-    <p>在开始安装之前需要提醒以下电脑是笔记本的同学，极有可能电脑是双显卡，因此需要将飞英伟达的那块显卡禁用掉才能进行以下操作。当然如果只安装了一块显卡的台式机，可以直接跳过这一步，正式开始安装环境。</p>
+    <p>在开始安装之前需要提醒以下电脑是笔记本的同学，极有可能电脑是双显卡，因此需要将飞英伟达的那块显卡禁用掉才能进行以下操作。当然如果只安装了一块显卡的台式机，可以直接跳过这一步，正式开始安装环境。
+Nouveau是Ubuntu自带的第三方开源N卡驱动，安装NVIDIA官方驱动之前需要禁用Nouveau.</p>
   </li>
 </ol>
 
-<p>Nouveau是Ubuntu自带的第三方开源N卡驱动，安装NVIDIA官方驱动之前需要禁用Nouveau.
-（1）删除所有已经安装的nvidia驱动（如果系统是新装的跳过这个步骤）</p>
+<p>（1）删除所有已经安装的nvidia驱动（如果系统是新装的跳过这个步骤）</p>
 <div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 </pre></td><td class="rouge-code"><pre><span class="nv">$ </span><span class="nb">sudo </span>apt-get remove nvidia<span class="k">*</span> <span class="o">&amp;&amp;</span> <span class="nb">sudo </span>apt autoremove
 </pre></td></tr></tbody></table></code></pre></div></div>
+
 <p>（2）安装一些依赖库</p>
 <pre><code class="language-shel">$ sudo apt-get install dkms build-essential linux-headers-generic
 </code></pre>
+
 <p>（3）禁用Nouveau
 终端输入<code class="highlighter-rouge">sudo gedit /etc/modprobe.d/blacklist.conf</code>在弹出的文本文件中增加下面几句语句</p>
 <div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
@@ -271,13 +273,15 @@ options nouveau <span class="nv">modeset</span><span class="o">=</span>0
 <span class="nv">$ </span><span class="nb">sudo </span>tee <span class="nt">-a</span> /etc/modprobe.d/nouveau-kms.conf
 <span class="nv">$ </span><span class="nb">sudo </span>update-initramfs <span class="nt">-u</span>
 </pre></td></tr></tbody></table></code></pre></div></div>
-<p>重启<code class="highlighter-rouge">$ reboot</code>
-（4）通过这个命令<code class="highlighter-rouge">lsmod | grep nouveau</code>来确认系统是否已经禁用Nouveau，如果没有任何反馈结果，说明已经禁用成功。</p>
+<p>重启<code class="highlighter-rouge">$ reboot</code></p>
+
+<p>（4）通过这个命令<code class="highlighter-rouge">lsmod | grep nouveau</code>来确认系统是否已经禁用Nouveau，如果没有任何反馈结果，说明已经禁用成功。</p>
 
 <h3 id="1-安装gpu版本的tensorflow">1. 安装GPU版本的tensorflow</h3>
-<p>ubuntu 16.04 系统自带python 2.7，我们可以通过在终端输入<code class="highlighter-rouge">python</code>来验证，并且查看版本号，退出python则输入<code class="highlighter-rouge">exit()</code>。
-<strong>（1）安装pip</strong>
-接下来正式安装大名鼎鼎的tensorflow，选用pip安装的方式最为便捷。pip是安装python拓展软件包的一个插件，安装命令如下：</p>
+<p>ubuntu 16.04 系统自带python 2.7，我们可以通过在终端输入<code class="highlighter-rouge">python</code>来验证，并且查看版本号，退出python则输入<code class="highlighter-rouge">exit()</code>。</p>
+
+<h4 id="1安装pip">（1）安装pip</h4>
+<p>接下来正式安装大名鼎鼎的tensorflow，选用pip安装的方式最为便捷。pip是安装python拓展软件包的一个插件，安装命令如下：</p>
 <div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 </pre></td><td class="rouge-code"><pre><span class="nv">$ </span><span class="nb">sudo </span>apt-get install python-pip python-dev <span class="c">#安装pip</span>
@@ -298,17 +302,19 @@ trusted-host=mirrors.aliyun.com
 index-url=https://mirrors.aliyun.com/pypi/simple/
 </pre></td></tr></tbody></table></code></pre></div></div>
 <p>再保存，关闭。顺带这里提一句，系统的更新也建议切换至国内的源，如下图所示：
-<img src="/img/in-post/GAN/fig1.png" alt="" />
-<strong>（2）安装GPU驱动</strong>
-终端输入<code class="highlighter-rouge">sudo apt-get update</code></p>
+<img src="/img/in-post/GAN/fig1.png" alt="" /></p>
+
+<h4 id="2安装gpu驱动">（2）安装GPU驱动</h4>
+<p>终端输入<code class="highlighter-rouge">sudo apt-get update</code></p>
 
 <p>如下图所示在图形界面中安装显卡驱动：
 System Settings →Software &amp; Updates→Additional Drivers→Nvidia Corporation→Apply Changes→重启
 <img src="/img/in-post/GAN/fig2.png" alt="" />
  验证安装，终端输入<code class="highlighter-rouge">nvidia-settings</code>，出现以下界面说明安装成功
-<img src="/img/in-post/GAN/fig3.png" alt="" />
-<strong>（3）安装bazel</strong>
- bazel是Google推出的用来编译tensorflow开源工具，注意这里我们不按照官方安装教程，因为过高版本的bazel会造成后期的编译问题。首先我们在终端输入以下命令：</p>
+<img src="/img/in-post/GAN/fig3.png" alt="" /></p>
+
+<h4 id="3安装bazel">（3）安装bazel</h4>
+<p>bazel是Google推出的用来编译tensorflow开源工具，注意这里我们不按照官方安装教程，因为过高版本的bazel会造成后期的编译问题。首先我们在终端输入以下命令：</p>
 <div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 3
@@ -323,8 +329,8 @@ System Settings →Software &amp; Updates→Additional Drivers→Nvidia Corporat
 <span class="nv">$ </span><span class="nb">sudo</span> ./bazel-0.5.4-installer-linux-x86_64.sh
 </pre></td></tr></tbody></table></code></pre></div></div>
 
-<p><strong>（4）安装CUDA 8.0</strong>
-这里各位也要注意了，各个软件的版本好一定要对上，并非越高级的版本越有效，有时候会出现一些难以解释的问题，都是由于版本不对导致的。这里我们选择CUDA8.0 GA2版本，下载链接：<a href="https://developer.nvidia.com/cuda-toolkit-archive">https://developer.nvidia.com/cuda-toolkit-archive</a> 按照下图步骤选择，下载deb安装文件。
+<h4 id="4安装cuda-80">（4）安装CUDA 8.0</h4>
+<p>这里各位也要注意了，各个软件的版本好一定要对上，并非越高级的版本越有效，有时候会出现一些难以解释的问题，都是由于版本不对导致的。这里我们选择CUDA8.0 GA2版本，下载链接：<a href="https://developer.nvidia.com/cuda-toolkit-archive">https://developer.nvidia.com/cuda-toolkit-archive</a> 按照下图步骤选择，下载deb安装文件。
 <img src="/img/in-post/GAN/fig4.png" alt="" />
 下载完毕后，用终端进入到存放安装包的目录下<code class="highlighter-rouge">cd &lt;installpath&gt;</code>，然后</p>
 <div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
@@ -334,8 +340,9 @@ System Settings →Software &amp; Updates→Additional Drivers→Nvidia Corporat
 <span class="nv">$ </span><span class="nb">sudo </span>apt-get update
 <span class="nv">$ </span><span class="nb">sudo </span>apt-get install cuda
 </pre></td></tr></tbody></table></code></pre></div></div>
-<p><strong>（5）安装cudnn 5.1</strong>
-安装包下载地址：<a href="https://developer.nvidia.com/rdp/cudnn-archive">https://developer.nvidia.com/rdp/cudnn-archive</a> 如下图选择<code class="highlighter-rouge">cuDNN v5.1 Library for Linux</code>
+
+<h4 id="5安装cudnn-51">（5）安装cudnn 5.1</h4>
+<p>安装包下载地址：<a href="https://developer.nvidia.com/rdp/cudnn-archive">https://developer.nvidia.com/rdp/cudnn-archive</a> 如下图选择<code class="highlighter-rouge">cuDNN v5.1 Library for Linux</code>
 <img src="/img/in-post/GAN/fig5.png" alt="" />
 下载完毕后进入下载的文件目录，解压缩，拷贝，覆盖，更新软链接</p>
 <div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
@@ -355,8 +362,9 @@ System Settings →Software &amp; Updates→Additional Drivers→Nvidia Corporat
 <span class="nv">$ </span><span class="nb">sudo </span>ln <span class="nt">-s</span> libcudnn.so.5.1.5 libcudnn.so.5 <span class="c">#生成软衔接</span>
 <span class="nv">$ </span><span class="nb">sudo </span>ln <span class="nt">-s</span> libcudnn.so.5 libcudnn.so <span class="c">#生成软链接</span>
 </pre></td></tr></tbody></table></code></pre></div></div>
-<p><strong>（6）配置系统环境变量</strong>
-在终端中输入：</p>
+
+<h4 id="6配置系统环境变量">（6）配置系统环境变量</h4>
+<p>在终端中输入：</p>
 <div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 </pre></td><td class="rouge-code"><pre><span class="nv">$ </span><span class="nb">sudo </span>gedit ~/.bashrc <span class="c">#打开.bashrc文件</span>
 </pre></td></tr></tbody></table></code></pre></div></div>
@@ -366,8 +374,8 @@ System Settings →Software &amp; Updates→Additional Drivers→Nvidia Corporat
 </pre></td></tr></tbody></table></code></pre></div></div>
 <p>重启电脑。</p>
 
-<p><strong>（7）安装tensorflow</strong>
-在此之前安装其他依赖包</p>
+<h4 id="7安装tensorflow">（7）安装tensorflow</h4>
+<p>在此之前安装其他依赖包</p>
 <div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 </pre></td><td class="rouge-code"><pre><span class="nv">$ </span><span class="nb">sudo </span>apt-get install python-numpy python-dev python-wheel
 </pre></td></tr></tbody></table></code></pre></div></div>
@@ -496,8 +504,9 @@ No MPI support will be enabled for TensorFlow.
 <div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 </pre></td><td class="rouge-code"><pre><span class="nv">$ </span><span class="nb">sudo </span>pip install tensorflow-1.5.0rc0-cp27-cp27mu-linux_x86_64.whl
 </pre></td></tr></tbody></table></code></pre></div></div>
-<p><strong>（8）验证tensorflow</strong>
-提示安装成功后，在命令行输入<code class="highlighter-rouge">python</code>，运行python终端，输入以下代码：</p>
+
+<h4 id="8验证tensorflow">（8）验证tensorflow</h4>
+<p>提示安装成功后，在命令行输入<code class="highlighter-rouge">python</code>，运行python终端，输入以下代码：</p>
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 3
@@ -570,18 +579,21 @@ No MPI support will be enabled for TensorFlow.
 <p>我们遮住数字的一部分，完全不影响算法识别出数字的原来的样子，这样的性能在某些工业领域完全足够能够胜任。
 <img src="/img/in-post/GAN/fig9.png" alt="" /></p>
 <h3 id="6训练">（6）训练</h3>
-<p>CSGM的训练代码是调用DCGAN，因此我们需要转向研究DCGAN模型。
-（1）下载DCGAN源代码
+<p>CSGM的训练代码是调用DCGAN，因此我们需要转向研究DCGAN模型。</p>
+
+<p>（1）下载DCGAN源代码
 DCGAN有很多版本的代码，这里我们选择tensorflow版本的，参考链接为<a href="https://github.com/carpedm20/DCGAN-tensorflow">https://github.com/carpedm20/DCGAN-tensorflow</a> 输入以下命令下载源码：</p>
 <div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 </pre></td><td class="rouge-code"><pre><span class="nv">$ </span>git clone https://github.com/carpedm20/DCGAN-tensorflow.git
 </pre></td></tr></tbody></table></code></pre></div></div>
+
 <p>（2）添加mnist数据集
 在DCGAN官方链接中提示我们需要在线下载数据库，但是在国内的同学使用脚本下载数据库会出现网络问题，因为google被墙了。所幸我们在上个部分CSGM中已经下载过这个数据集，只要把他们挪过来就可以使用了（<strong>注意mnist挪过来的时候里面的压缩包都要解压，然后每个文件的名字都需要将中间的.改成-</strong>）。
 <img src="/img/in-post/GAN/fig10.png" alt="" />
 <img src="/img/in-post/GAN/fig11.png" alt="" />
-<img src="/img/in-post/GAN/fig12.png" alt="" />
-（3）训练和测试
+<img src="/img/in-post/GAN/fig12.png" alt="" /></p>
+
+<p>（3）训练和测试
 在DCGAN根目录下的终端中输入</p>
 <div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 </pre></td><td class="rouge-code"><pre><span class="nv">$ </span>python main.py <span class="nt">--dataset</span> mnist <span class="nt">--input_height</span><span class="o">=</span>28 <span class="nt">--output_height</span><span class="o">=</span>28 <span class="nt">--train</span>
