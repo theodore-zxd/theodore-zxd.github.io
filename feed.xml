@@ -5,8 +5,8 @@
     <description>人工智障，机器算命</description>
     <link>http://localhost:4000/</link>
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml" />
-    <pubDate>Thu, 04 Apr 2019 15:02:49 +0800</pubDate>
-    <lastBuildDate>Thu, 04 Apr 2019 15:02:49 +0800</lastBuildDate>
+    <pubDate>Thu, 04 Apr 2019 15:09:40 +0800</pubDate>
+    <lastBuildDate>Thu, 04 Apr 2019 15:09:40 +0800</lastBuildDate>
     <generator>Jekyll v3.7.4</generator>
     
       <item>
@@ -92,7 +92,7 @@ index-url=https://mirrors.aliyun.com/pypi/simple/
 &lt;p&gt;如下图所示在图形界面中安装显卡驱动：
 System Settings →Software &amp;amp; Updates→Additional Drivers→Nvidia Corporation→Apply Changes→重启
 &lt;img src=&quot;/img/in-post/GAN/fig2.png&quot; alt=&quot;&quot; /&gt;
- 验证安装，终端输入&lt;code class=&quot;highlighter-rouge&quot;&gt;nvidia -settings&lt;/code&gt;，出现以下界面说明安装成功
+ 验证安装，终端输入&lt;code class=&quot;highlighter-rouge&quot;&gt;nvidia-settings&lt;/code&gt;，出现以下界面说明安装成功
 &lt;img src=&quot;/img/in-post/GAN/fig3.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 
 &lt;h4 id=&quot;3安装bazel&quot;&gt;（3）安装bazel&lt;/h4&gt;
