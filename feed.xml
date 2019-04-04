@@ -5,8 +5,8 @@
     <description>人工智障，机器算命</description>
     <link>http://localhost:4000/</link>
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml" />
-    <pubDate>Thu, 04 Apr 2019 13:39:27 +0800</pubDate>
-    <lastBuildDate>Thu, 04 Apr 2019 13:39:27 +0800</lastBuildDate>
+    <pubDate>Thu, 04 Apr 2019 15:02:49 +0800</pubDate>
+    <lastBuildDate>Thu, 04 Apr 2019 15:02:49 +0800</lastBuildDate>
     <generator>Jekyll v3.7.4</generator>
     
       <item>
@@ -92,7 +92,7 @@ index-url=https://mirrors.aliyun.com/pypi/simple/
 &lt;p&gt;如下图所示在图形界面中安装显卡驱动：
 System Settings →Software &amp;amp; Updates→Additional Drivers→Nvidia Corporation→Apply Changes→重启
 &lt;img src=&quot;/img/in-post/GAN/fig2.png&quot; alt=&quot;&quot; /&gt;
- 验证安装，终端输入&lt;code class=&quot;highlighter-rouge&quot;&gt;nvidia-settings&lt;/code&gt;，出现以下界面说明安装成功
+ 验证安装，终端输入&lt;code class=&quot;highlighter-rouge&quot;&gt;nvidia -settings&lt;/code&gt;，出现以下界面说明安装成功
 &lt;img src=&quot;/img/in-post/GAN/fig3.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 
 &lt;h4 id=&quot;3安装bazel&quot;&gt;（3）安装bazel&lt;/h4&gt;
@@ -420,8 +420,8 @@ DCGAN有很多版本的代码，这里我们选择tensorflow版本的，参考�
 &lt;p&gt;在这里我将持续与大家分享和学习各类算法，愿每一个人都可以有收获。&lt;/p&gt;
 </description>
         <pubDate>Wed, 20 Mar 2019 00:00:00 +0800</pubDate>
-        <link>http://localhost:4000/2019/03/20/hello-2015/</link>
-        <guid isPermaLink="true">http://localhost:4000/2019/03/20/hello-2015/</guid>
+        <link>http://localhost:4000/2019/03/20/hello/</link>
+        <guid isPermaLink="true">http://localhost:4000/2019/03/20/hello/</guid>
         
         <category>生活</category>
         
