@@ -368,6 +368,12 @@ System Settings →Software &amp; Updates→Additional Drivers→Nvidia Corporat
 <div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 </pre></td><td class="rouge-code"><pre><span class="nv">$ </span><span class="nb">sudo </span>gedit ~/.bashrc <span class="c">#打开.bashrc文件</span>
 </pre></td></tr></tbody></table></code></pre></div></div>
+<p>在弹出的文本编辑界面中，在文本的最后添加以下两行脚本：</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+</pre></td><td class="rouge-code"><pre>export PATH=/usr/local/cuda-8.0/bin${PATH:+:${PATH}}
+export LD_LIBRARY_PATH=/usr/local/cuda-8.0/lib64${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}
+</pre></td></tr></tbody></table></code></pre></div></div>
 <p>保存，并使设置立即生效，在终端中输入</p>
 <div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 </pre></td><td class="rouge-code"><pre><span class="nv">$ </span><span class="nb">source</span> ~/.bashrc
