@@ -1,8 +1,8 @@
-#Xudong's Blog
+# Xudong's Blog
 
-###[View Live my Blog](http://www.zxd-ai.com/)
+### [View Live my Blog](http://www.zxd-ai.com/)
 
-![](http://www.zxd-ai.com/img/readme-bg.jpg)
+![](/img/readme-bg.jpg)
 
 
 
