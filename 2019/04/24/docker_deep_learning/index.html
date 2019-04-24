@@ -14,7 +14,7 @@
     <meta property="og:title" content="docker入门 - 张旭东的博客 | Xudong's Blog">
     
     <meta property="og:type" content="article">
-    <meta property="og:description" content="Docker简介
+    <meta property="og:description" content="一、Docker简介
 深度学习甚至其他机器学习算法对于系统的环境是苛刻的，往往我们需要花大量的时间去完成一套算法的配置。但是当我们想切换另一套代码时，会发现它所要求的运行环境与前一套大相径庭。如果我们重新安装系统从头开始配置新的环境，那之前配置的那套环境又前功尽弃了。
 
 ">
@@ -237,7 +237,7 @@ var _hmt = _hmt || [];
                 <!-- Multi-Lingual -->
                 
 
-				<h1 id="docker简介">Docker简介</h1>
+				<h1 id="一docker简介">一、Docker简介</h1>
 <p>深度学习甚至其他机器学习算法对于系统的环境是苛刻的，往往我们需要花大量的时间去完成一套算法的配置。但是当我们想切换另一套代码时，会发现它所要求的运行环境与前一套大相径庭。如果我们重新安装系统从头开始配置新的环境，那之前配置的那套环境又前功尽弃了。</p>
 
 <p>所以我们本能的想到：是不是有一种方法，让多种系统环境存在于一台PC上呢？也许虚拟机是你第一种想到的方法。</p>
@@ -251,15 +251,16 @@ var _hmt = _hmt || [];
 
 <p>本文就从安装和配置开始教大家如何使用docker和用它怎么搭建深度学习算法运行环境，最后实现用docker搭建深度学习的推荐系统Neural Factorization Machine.</p>
 
-<h1 id="本机docker宿主机系统环境">本机（docker宿主机）系统环境</h1>
-<p><strong>（1）64位 ubuntu16.04 **
-**（2）独立NVIDIA显卡</strong>
-同学们要注意哦，由于有些笔记本包含独立显卡和集成显卡，里面涉及到禁用集成显卡的问题，比较复杂。这里我们就用台式机的独立显卡来作为硬件环境进行研究。</p>
+<h1 id="二本机docker宿主机系统环境">二、本机（docker宿主机）系统环境</h1>
+<p><strong>（1）64位 ubuntu16.04</strong>
+<strong>（2）独立NVIDIA显卡</strong></p>
 
-<h1 id="安装docker和nvidia-docker">安装docker和nvidia-docker</h1>
+<p>同学们要注意哦，由于有些笔记本包含独立显卡和集成显卡，里面涉及到禁用集成显卡的问题，比较复杂。这里我们就用台式机的独立显卡来作为硬件环境进行研究。</p>
+
+<h1 id="三安装docker和nvidia-docker">三、安装docker和nvidia-docker</h1>
 <p>使用docker来配置深度学习环境的容器需要安装英伟达的插件，因为普通的docker容器里是没有显卡驱动的。而官方的docker安装指南和nvidia插件安装指南可以参考以下两个链接。</p>
 
-<p><em>docker：</em>
+<p><em>docker:</em>
 <a href="https://docs.docker.com/install/linux/docker-ce/ubuntu/#prerequisites">https://docs.docker.com/install/linux/docker-ce/ubuntu/#prerequisites</a></p>
 
 <p><em>nvidia-docker:</em>
@@ -298,8 +299,8 @@ var _hmt = _hmt || [];
 <p>如果系统之前安装过nvidia-docker插件的话，需要清除下：</p>
 <div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
-</pre></td><td class="rouge-code"><pre><span class="nb">sudo </span>docker volume <span class="nb">ls</span> <span class="nt">-q</span> <span class="nt">-f</span> <span class="nv">driver</span><span class="o">=</span>nvidia-docker | xargs <span class="nt">-r</span> <span class="nt">-I</span><span class="o">{}</span> <span class="nt">-n1</span> docker ps <span class="nt">-q</span> <span class="nt">-a</span> <span class="nt">-f</span> <span class="nv">volume</span><span class="o">={}</span> | xargs <span class="nt">-r</span> docker rm <span class="nt">-f</span>
-<span class="nb">sudo </span>apt-get purge <span class="nt">-y</span> nvidia-docker
+</pre></td><td class="rouge-code"><pre><span class="nv">$ </span><span class="nb">sudo </span>docker volume <span class="nb">ls</span> <span class="nt">-q</span> <span class="nt">-f</span> <span class="nv">driver</span><span class="o">=</span>nvidia-docker | xargs <span class="nt">-r</span> <span class="nt">-I</span><span class="o">{}</span> <span class="nt">-n1</span> docker ps <span class="nt">-q</span> <span class="nt">-a</span> <span class="nt">-f</span> <span class="nv">volume</span><span class="o">={}</span> | xargs <span class="nt">-r</span> docker rm <span class="nt">-f</span>
+<span class="nv">$ </span><span class="nb">sudo </span>apt-get purge <span class="nt">-y</span> nvidia-docker
 </pre></td></tr></tbody></table></code></pre></div></div>
 
 <p>没有装过的话，我们正式开始安装nvidia插件</p>
@@ -331,15 +332,15 @@ var _hmt = _hmt || [];
 <p>最后出现以下类似内容说明nvidia-docker已经安装成功了。
 <img src="/img/in-post/docker/fig3.png" alt="" /></p>
 
-<h1 id="创建容器下的深度学习运行环境">创建容器下的深度学习运行环境</h1>
-<h2 id="镜像image和容器container">镜像Image和容器Container</h2>
+<h1 id="四创建容器下的深度学习运行环境">四、创建容器下的深度学习运行环境</h1>
+<h2 id="1-镜像image和容器container">(1) 镜像Image和容器Container</h2>
 <p>在学习使用docker之前，我们应该知道两个概念：<strong>镜像Image</strong>和<strong>容器Container</strong>。</p>
 
 <p>镜像image其实通俗的理解为<strong>“系统安装盘”</strong>，有个安装盘是ubuntu16.04有的安装盘是ubuntu18.04，有的安装盘里已经装好了tensorflow，有的安装盘里本身就有CUDA8.0等等。而容器则可以通俗理解为<strong>“安装好的系统”</strong>，一个系统盘可以装好几个系统，一台电脑上也可以装好几个不同的系统，正如下图所示。</p>
 
 <p><img src="/img/in-post/docker/fig4.png" alt="" width="400px" height="230px" /></p>
 
-<h2 id="拉取镜像">拉取镜像</h2>
+<h2 id="2-拉取镜像">(2) 拉取镜像</h2>
 <p>首先我们可以使用<code class="highlighter-rouge">sudo docker images</code>来查看自己已经安装了哪些镜像，如下图所示。</p>
 
 <p><img src="/img/in-post/docker/fig5.png" alt="" /></p>
@@ -348,7 +349,7 @@ var _hmt = _hmt || [];
 
 <p>那么我们怎么知道有哪些镜像可以挑选呢？这里就必须介绍docker hub官网了<a href="https://hub.docker.com/">https://hub.docker.com/</a> ，在这里我们可以选我们想要的哪些镜像，然后通过命令的方式<code class="highlighter-rouge">sudo docker image pull xxxx</code>来下载。像tensorflow、cuda之类的应用都有官方镜像库，当然我们也可以挑选有些达人自己做的镜像，这么一想docker hub就有点像github了。</p>
 
-<h2 id="实例化容器">实例化容器</h2>
+<h2 id="3-实例化容器">(3) 实例化容器</h2>
 <p>这里我们就以cuda8.0-cudnn5-devel-ubuntu16.04这个镜像为例子，搭建一套深度学习的开发环境。</p>
 
 <p>首先我们将这个镜像实例化为容器:</p>
@@ -362,14 +363,13 @@ var _hmt = _hmt || [];
 
 <p>这里我们可以发现，shell的提示符已经发生了变化，如上图的<code class="highlighter-rouge">root@b8972adc4506:</code>，这说明我们现在已经在终端内部了，@后的这串字符串就是这个容器的唯一ID。</p>
 
-<p>现在我们就可以把这个容器当做是一般的ubuntu环境来用就行了。但是有两点需要注意：
-**1. 容器始终都是拥有root权限，因此不需要在某些命令前面打<code class="highlighter-rouge">sudo</code></p>
-<ol>
-  <li>容器可以看做是没有显示器的主机，没有UI界面，因此无法使用一些需要调用UI的应用，诸如gedit等。（文本输入可用vim代替）
-**</li>
-</ol>
+<p>现在我们就可以把这个容器当做是一般的ubuntu环境来用就行了。但是有两点需要注意：</p>
 
-<h2 id="使用容器配置深度学习算法环境">使用容器配置深度学习算法环境</h2>
+<p><strong>1. 容器始终都是拥有root权限，因此不需要在某些命令前面打<code class="highlighter-rouge">sudo</code></strong></p>
+
+<p><strong>2. 容器可以看做是没有显示器的主机，没有UI界面，因此无法使用一些需要调用UI的应用，诸如gedit等。（文本输入可用vim代替）</strong></p>
+
+<h2 id="4-使用容器配置深度学习算法环境">(4) 使用容器配置深度学习算法环境</h2>
 <p>在刚才创建的这个容器里还没有安装python和tensorflow，下面几步骤使用pip安装上述两者及其他一些拓展包。</p>
 <div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
@@ -391,7 +391,7 @@ var _hmt = _hmt || [];
 <p>如果运行结果如下图类似，那么恭喜你完成了配置，撒花！
 <img src="/img/in-post/docker/fig7.png" alt="" /></p>
 
-<h1 id="docker常用命令">docker常用命令</h1>
+<h1 id="五docker常用命令">五、docker常用命令</h1>
 <p><strong>以下命令如果需要调用显卡，需要在<code class="highlighter-rouge">docker</code>前添加<code class="highlighter-rouge">nvidia-</code>前缀。</strong></p>
 <div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
@@ -406,7 +406,7 @@ var _hmt = _hmt || [];
 <span class="nv">$ </span><span class="nb">sudo </span>docker rm &lt;container-name or container-id&gt; <span class="c">#删除容器</span>
 <span class="nv">$ </span><span class="nb">sudo </span>docker inspect &lt;container-name or container-id&gt; <span class="c">#显示容器相关信息</span>
 </pre></td></tr></tbody></table></code></pre></div></div>
-<h1 id="总结">总结</h1>
+<h1 id="六总结">六、总结</h1>
 <p>通过本帖子大家可以学会如何使用docker来配置深度学习的容器，以后可以在自己电脑上配置多个环境，想调哪个调哪个，可以说docker是玩转算法的大杀器。</p>
 
 <p>本博客之前几篇文章专注于环境的搭建，之后我想跟大家多讨论一些算法的原理和技术细节，请大家拭目以待。</p>
