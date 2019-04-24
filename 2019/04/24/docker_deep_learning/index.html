@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="description" content="人工智障，机器算命">
+    <meta name="keywords"  content="博客, 个人网站, 互联网, Web, AI, deep learning, image processing">
+    <meta name="theme-color" content="#000000">
+    <meta name="baidu-site-verification" content="cFURnV59pK" />
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="docker入门 - 张旭东的博客 | Xudong's Blog">
+    
+    <meta property="og:type" content="article">
+    <meta property="og:description" content="Docker简介
+深度学习甚至其他机器学习算法对于系统的环境是苛刻的，往往我们需要花大量的时间去完成一套算法的配置。但是当我们想切换另一套代码时，会发现它所要求的运行环境与前一套大相径庭。如果我们重新安装系统从头开始配置新的环境，那之前配置的那套环境又前功尽弃了。
+
+">
+    
+    <meta property="article:published_time" content="2019-04-24T00:00:00Z">
+    
+    
+    <meta property="article:author" content="Xudong">
+    
+    
+    <meta property="article:tag" content="docker">
+    
+    <meta property="article:tag" content="深度学习">
+    
+    <meta property="article:tag" content="推荐系统">
+    
+    
+    <meta property="og:image" content="http://localhost:4000/img/avatar-star.jpg">
+    <meta property="og:url" content="http://localhost:4000/2019/04/24/docker_deep_learning/">
+    <meta property="og:site_name" content="张旭东的博客 | Xudong's Blog">
+    
+    <title>docker入门 - 张旭东的博客 | Xudong's Blog</title>
+
+    <!-- Web App Manifest -->
+    <link rel="manifest" href="/pwa/manifest.json">
+
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="/img/favicon.ico">
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="http://localhost:4000/2019/04/24/docker_deep_learning/">
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/hux-blog.min.css">
+
+    <!-- Custom Fonts -->
+    <!-- <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"> -->
+    <!-- Hux change font-awesome CDN to qiniu -->
+    <link href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- ga & ba script hoook -->
+    <script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?4a947e867b7ebd2c79aa30cd5a701a78";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+</head>
+
+
+<!-- hack iOS CSS :active style -->
+<body ontouchstart="">
+
+    <!-- Navigation -->
+
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">Xudong's Blog</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div id="huxblog_navbar">
+            <div class="navbar-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="/">Home</a>
+                    </li>
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    <li>
+                        <a href="/tags/">Tags</a>
+                    </li>
+                    
+                    
+                    
+                    
+                </ul>
+            </div>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+<script>
+    // Drop Bootstarp low-performance Navbar
+    // Use customize navbar with high-quality material design animation
+    // in high-perf jank-free CSS3 implementation
+    var $body   = document.body;
+    var $toggle = document.querySelector('.navbar-toggle');
+    var $navbar = document.querySelector('#huxblog_navbar');
+    var $collapse = document.querySelector('.navbar-collapse');
+
+    var __HuxNav__ = {
+        close: function(){
+            $navbar.className = " ";
+            // wait until animation end.
+            setTimeout(function(){
+                // prevent frequently toggle
+                if($navbar.className.indexOf('in') < 0) {
+                    $collapse.style.height = "0px"
+                }
+            },400)
+        },
+        open: function(){
+            $collapse.style.height = "auto"
+            $navbar.className += " in";
+        }
+    }
+
+    // Bind Event
+    $toggle.addEventListener('click', function(e){
+        if ($navbar.className.indexOf('in') > 0) {
+            __HuxNav__.close()
+        }else{
+            __HuxNav__.open()
+        }
+    })
+
+    /**
+     * Since Fastclick is used to delegate 'touchstart' globally
+     * to hack 300ms delay in iOS by performing a fake 'click',
+     * Using 'e.stopPropagation' to stop 'touchstart' event from 
+     * $toggle/$collapse will break global delegation.
+     * 
+     * Instead, we use a 'e.target' filter to prevent handler
+     * added to document close HuxNav.  
+     *
+     * Also, we use 'click' instead of 'touchstart' as compromise
+     */
+    document.addEventListener('click', function(e){
+        if(e.target == $toggle) return;
+        if(e.target.className == 'icon-bar') return;
+        __HuxNav__.close();
+    })
+</script>
+
+
+    <!-- Image to hack wechat -->
+<!-- <img src="/img/icon_wechat.png" width="0" height="0"> -->
+<!-- <img src="/img/post_trains.jpg" width="0" height="0"> -->
+
+<!-- Post Header -->
+<style type="text/css">
+    header.intro-header{
+        position: relative;
+        background-image: url('/img/post_trains.jpg')
+    }
+
+    
+</style>
+<header class="intro-header" >
+    <div class="header-mask"></div>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="post-heading">
+                    <div class="tags">
+                        
+                        <a class="tag" href="/tags/#docker" title="docker">docker</a>
+                        
+                        <a class="tag" href="/tags/#深度学习" title="深度学习">深度学习</a>
+                        
+                        <a class="tag" href="/tags/#推荐系统" title="推荐系统">推荐系统</a>
+                        
+                    </div>
+                    <h1>docker入门</h1>
+                    
+                    
+                    <h2 class="subheading"> "用docker搭建深度学习推荐系统的运行环境"</h2>
+                    
+                    <span class="meta">Posted by Xudong on April 24, 2019</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+
+    <!-- Post Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                post-container">
+
+                <!-- Multi-Lingual -->
+                
+
+				<h1 id="docker简介">Docker简介</h1>
+<p>深度学习甚至其他机器学习算法对于系统的环境是苛刻的，往往我们需要花大量的时间去完成一套算法的配置。但是当我们想切换另一套代码时，会发现它所要求的运行环境与前一套大相径庭。如果我们重新安装系统从头开始配置新的环境，那之前配置的那套环境又前功尽弃了。</p>
+
+<p>所以我们本能的想到：是不是有一种方法，让多种系统环境存在于一台PC上呢？也许虚拟机是你第一种想到的方法。</p>
+
+<p>一个系统装多个版本的虚拟机，不同虚拟机内配置不同的运行环境，是不是就能解决了这个问题？</p>
+
+<p>虚拟机只能部分解决这类问题。用过虚拟机的同学可能会发现以下问题：觉得系统跑虚拟机时特别费劲，用笔记本的同学会发现本子发烫，虚拟机内应用反应慢一拍等等。另外更重要的一点就是，用<strong>虚拟机</strong>跑深度学习，对于<strong>显卡的兼容性极差</strong>，基本可以放弃使用虚拟机装CUDA了。</p>
+
+<p>说到这里我们就要隆重介绍下容器——Docker。刚上手我们可以把他看做是<strong>“没有操作系统的虚拟机”</strong>，也就是说容器可以与宿主机共享一个操作系统，共享CPU、RAM以及硬盘等。但是容器拥有独立的系统环境，因此可以保证部署独立的应用而不受宿主机的配置环境的影响。此外在一台机器上配置多个环境，在多种环境之间切换不同功能的算法，这在做研究时可以当做是一种杀手锏。
+<img src="/img/in-post/docker/fig1.jpg" alt="" /></p>
+
+<p>本文就从安装和配置开始教大家如何使用docker和用它怎么搭建深度学习算法运行环境，最后实现用docker搭建深度学习的推荐系统Neural Factorization Machine.</p>
+
+<h1 id="本机docker宿主机系统环境">本机（docker宿主机）系统环境</h1>
+<p><strong>（1）64位 ubuntu16.04 **
+**（2）独立NVIDIA显卡</strong>
+同学们要注意哦，由于有些笔记本包含独立显卡和集成显卡，里面涉及到禁用集成显卡的问题，比较复杂。这里我们就用台式机的独立显卡来作为硬件环境进行研究。</p>
+
+<h1 id="安装docker和nvidia-docker">安装docker和nvidia-docker</h1>
+<p>使用docker来配置深度学习环境的容器需要安装英伟达的插件，因为普通的docker容器里是没有显卡驱动的。而官方的docker安装指南和nvidia插件安装指南可以参考以下两个链接。</p>
+
+<p><em>docker：</em>
+<a href="https://docs.docker.com/install/linux/docker-ce/ubuntu/#prerequisites">https://docs.docker.com/install/linux/docker-ce/ubuntu/#prerequisites</a></p>
+
+<p><em>nvidia-docker:</em>
+<a href="https://devblogs.nvidia.com/nvidia-docker-gpu-server-application-deployment-made-easy/">https://devblogs.nvidia.com/nvidia-docker-gpu-server-application-deployment-made-easy/</a></p>
+
+<p>不想看官方文档的同学可以看本节总结的以下几个步骤。当然在宿主机安装docker之前需要确认自己的电脑已经拥有nvidia显卡的完整驱动，用<code class="highlighter-rouge">nvidia-smi</code>这句命令来验证是否安装完整nvidia驱动。</p>
+
+<h2 id="1如果本机之前安装过docker需要卸载旧docker">（1）如果本机之前安装过docker，需要卸载旧docker：</h2>
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="nv">$ </span><span class="nb">sudo </span>apt-get remove docker docker-engine docker.io containerd runc
+</pre></td></tr></tbody></table></code></pre></div></div>
+<h2 id="2安装docker-ce-社区版本community-edition的docker">（2）安装Docker CE 社区版本（Community Edition）的docker</h2>
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+</pre></td><td class="rouge-code"><pre><span class="nv">$ </span><span class="nb">sudo </span>apt-get update
+<span class="nv">$ </span><span class="nb">sudo </span>apt-get install apt-transport-https ca-certificates curl gnupg-agent  software-properties-common
+<span class="nv">$ </span>curl <span class="nt">-fsSL</span> https://download.docker.com/linux/ubuntu/gpg | <span class="nb">sudo </span>apt-key add -
+<span class="nv">$ </span><span class="nb">sudo </span>apt-key fingerprint 0EBFCD88
+<span class="nv">$ </span><span class="nb">sudo </span>add-apt-repository <span class="s2">"deb [arch=amd64] https://download.docker.com/linux/ubuntu </span><span class="k">$(</span>lsb_release <span class="nt">-cs</span><span class="k">)</span><span class="s2"> stable"</span>
+<span class="nv">$ </span><span class="nb">sudo </span>apt-get update
+<span class="nv">$ </span><span class="nb">sudo </span>apt-get install docker-ce docker-ce-cli containerd.io
+</pre></td></tr></tbody></table></code></pre></div></div>
+<p>完成安装docker，然后可以在终端输入</p>
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="nv">$ </span><span class="nb">sudo </span>docker run hello-world
+</pre></td></tr></tbody></table></code></pre></div></div>
+<p>来检验安装，如果出现以下界面，则说明docker安装成功。
+<img src="/img/in-post/docker/fig2.png" alt="" /></p>
+
+<h2 id="3安装nvidia-docker的插件">（3）安装nvidia-docker的插件</h2>
+<p>如果系统之前安装过nvidia-docker插件的话，需要清除下：</p>
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+</pre></td><td class="rouge-code"><pre><span class="nb">sudo </span>docker volume <span class="nb">ls</span> <span class="nt">-q</span> <span class="nt">-f</span> <span class="nv">driver</span><span class="o">=</span>nvidia-docker | xargs <span class="nt">-r</span> <span class="nt">-I</span><span class="o">{}</span> <span class="nt">-n1</span> docker ps <span class="nt">-q</span> <span class="nt">-a</span> <span class="nt">-f</span> <span class="nv">volume</span><span class="o">={}</span> | xargs <span class="nt">-r</span> docker rm <span class="nt">-f</span>
+<span class="nb">sudo </span>apt-get purge <span class="nt">-y</span> nvidia-docker
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>没有装过的话，我们正式开始安装nvidia插件</p>
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+</pre></td><td class="rouge-code"><pre><span class="c"># Add the package repositories</span>
+<span class="nv">$ </span>curl <span class="nt">-s</span> <span class="nt">-L</span> https://nvidia.github.io/nvidia-docker/gpgkey |   <span class="nb">sudo </span>apt-key add -
+<span class="nv">$ distribution</span><span class="o">=</span><span class="k">$(</span><span class="nb">.</span> /etc/os-release<span class="p">;</span><span class="nb">echo</span> <span class="nv">$ID$VERSION_ID</span><span class="k">)</span>
+<span class="nv">$ </span>curl <span class="nt">-s</span> <span class="nt">-L</span> https://nvidia.github.io/nvidia-docker/<span class="nv">$distribution</span>/nvidia-docker.list | <span class="nb">sudo </span>tee /etc/apt/sources.list.d/nvidia-docker.list
+<span class="nv">$ </span><span class="nb">sudo </span>apt-get update
+
+<span class="c"># Install nvidia-docker2 and reload the Docker daemon configuration</span>
+<span class="nv">$ </span><span class="nb">sudo </span>apt-get install <span class="nt">-y</span> nvidia-docker2
+<span class="nv">$ </span><span class="nb">sudo </span>pkill <span class="nt">-SIGHUP</span> dockerd
+
+<span class="c"># Test nvidia-smi with the latest official CUDA image</span>
+<span class="nv">$ </span><span class="nb">sudo </span>docker run <span class="nt">--runtime</span><span class="o">=</span>nvidia <span class="nt">--rm</span> nvidia/cuda:9.0-base nvidia-smi
+</pre></td></tr></tbody></table></code></pre></div></div>
+<p>最后出现以下类似内容说明nvidia-docker已经安装成功了。
+<img src="/img/in-post/docker/fig3.png" alt="" /></p>
+
+<h1 id="创建容器下的深度学习运行环境">创建容器下的深度学习运行环境</h1>
+<h2 id="镜像image和容器container">镜像Image和容器Container</h2>
+<p>在学习使用docker之前，我们应该知道两个概念：<strong>镜像Image</strong>和<strong>容器Container</strong>。</p>
+
+<p>镜像image其实通俗的理解为<strong>“系统安装盘”</strong>，有个安装盘是ubuntu16.04有的安装盘是ubuntu18.04，有的安装盘里已经装好了tensorflow，有的安装盘里本身就有CUDA8.0等等。而容器则可以通俗理解为<strong>“安装好的系统”</strong>，一个系统盘可以装好几个系统，一台电脑上也可以装好几个不同的系统，正如下图所示。</p>
+
+<p><img src="/img/in-post/docker/fig4.png" alt="" width="400px" height="230px" /></p>
+
+<h2 id="拉取镜像">拉取镜像</h2>
+<p>首先我们可以使用<code class="highlighter-rouge">sudo docker images</code>来查看自己已经安装了哪些镜像，如下图所示。</p>
+
+<p><img src="/img/in-post/docker/fig5.png" alt="" /></p>
+
+<p>可以看到我除了之前验证docker安装时拉取的hello-world和nvidia/cuda:9.0外，还拉取了其他的一些镜像。例如其中的tensorflow/tensorflow:1.12.0-devel-gpu系统镜像，我们就可以通过<code class="highlighter-rouge">sudo docker image pull tensorflow/tensorflow:1.12.0-devel-gpu</code>来下载。</p>
+
+<p>那么我们怎么知道有哪些镜像可以挑选呢？这里就必须介绍docker hub官网了<a href="https://hub.docker.com/">https://hub.docker.com/</a> ，在这里我们可以选我们想要的哪些镜像，然后通过命令的方式<code class="highlighter-rouge">sudo docker image pull xxxx</code>来下载。像tensorflow、cuda之类的应用都有官方镜像库，当然我们也可以挑选有些达人自己做的镜像，这么一想docker hub就有点像github了。</p>
+
+<h2 id="实例化容器">实例化容器</h2>
+<p>这里我们就以cuda8.0-cudnn5-devel-ubuntu16.04这个镜像为例子，搭建一套深度学习的开发环境。</p>
+
+<p>首先我们将这个镜像实例化为容器:</p>
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="nv">$ </span><span class="nb">sudo </span>nvidia-docker container run <span class="nt">-it</span> <span class="nt">--name</span> <span class="nb">test </span>nvidia/cuda:8.0-cudnn5-devel-ubuntu16.04 /bin/bash
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>然后我们具体解释下这个命令的每个部分：
+<strong>nvidia-</strong>这个前缀是必须的，是用来调用nvidia插件的。命令中的-it 参数是将容器和宿主机的终端连接起来的指令；–name后面是给这个容器取的名字，这个例子中容器叫做test；最后<code class="highlighter-rouge">/bin/bash</code>是打开了容器的终端。运行后的界面如下图所示：
+<img src="/img/in-post/docker/fig6.png" alt="" /></p>
+
+<p>这里我们可以发现，shell的提示符已经发生了变化，如上图的<code class="highlighter-rouge">root@b8972adc4506:</code>，这说明我们现在已经在终端内部了，@后的这串字符串就是这个容器的唯一ID。</p>
+
+<p>现在我们就可以把这个容器当做是一般的ubuntu环境来用就行了。但是有两点需要注意：
+**1. 容器始终都是拥有root权限，因此不需要在某些命令前面打<code class="highlighter-rouge">sudo</code></p>
+<ol>
+  <li>容器可以看做是没有显示器的主机，没有UI界面，因此无法使用一些需要调用UI的应用，诸如gedit等。（文本输入可用vim代替）
+**</li>
+</ol>
+
+<h2 id="使用容器配置深度学习算法环境">使用容器配置深度学习算法环境</h2>
+<p>在刚才创建的这个容器里还没有安装python和tensorflow，下面几步骤使用pip安装上述两者及其他一些拓展包。</p>
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+</pre></td><td class="rouge-code"><pre><span class="nv">$ </span>apt-get update <span class="c">#更新</span>
+<span class="nv">$ </span>apt-get install python <span class="c">#安装python2.7</span>
+<span class="nv">$ </span>apt-get install python-pip <span class="c">#安装pip</span>
+<span class="nv">$ </span>pip install tensorflow-gpu<span class="o">==</span>1.2.1 <span class="c">#安装gpu版本tensorflow1.2.1</span>
+<span class="nv">$ </span>apt-get install git <span class="c">#安装git</span>
+<span class="nv">$ </span>git clone https://github.com/theodore-zxd/neural_factorization_machine.git <span class="c">#这是一个应用深度学习实现推荐系统的应用</span>
+<span class="nv">$ </span>pip install sklearn <span class="c"># 安装其他一些需要的拓展库</span>
+<span class="nv">$ </span>python NeuralFM.py <span class="nt">--dataset</span> frappe <span class="nt">--hidden_factor</span> 64 <span class="nt">--layers</span> <span class="o">[</span>64] <span class="nt">--keep_prob</span> <span class="o">[</span>0.8,0.5] <span class="nt">--loss_type</span> square_loss <span class="nt">--activation</span> relu <span class="nt">--pretrain</span> 0 <span class="nt">--optimizer</span> AdagradOptimizer <span class="nt">--lr</span> 0.05 <span class="nt">--batch_norm</span> 1 <span class="nt">--verbose</span> 1 <span class="nt">--early_stop</span> 1 <span class="nt">--epoch</span> 200 <span class="c">#最后运行深度学习推荐系统NFM的示例代码</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+<p>如果运行结果如下图类似，那么恭喜你完成了配置，撒花！
+<img src="/img/in-post/docker/fig7.png" alt="" /></p>
+
+<h1 id="docker常用命令">docker常用命令</h1>
+<p><strong>以下命令如果需要调用显卡，需要在<code class="highlighter-rouge">docker</code>前添加<code class="highlighter-rouge">nvidia-</code>前缀。</strong></p>
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+</pre></td><td class="rouge-code"><pre><span class="nv">$ </span><span class="nb">sudo </span>docker container <span class="nb">ls</span> <span class="c">#列出所有正在运行的容器，后面跟上-a可显示所有容器</span>
+<span class="nv">$ </span><span class="nb">sudo </span>docker container <span class="nb">exec</span> <span class="nt">-it</span> &lt;container-name or container-id&gt; /bin/bash <span class="c">#开启容器的一个shell </span>
+<span class="nv">$ </span><span class="nb">sudo </span>docker container stop &lt;container-name or container-id&gt; <span class="c">#停止容器</span>
+<span class="nv">$ </span><span class="nb">sudo </span>docker start &lt;container-name or container-id&gt; <span class="c">#开启容器</span>
+<span class="nv">$ </span><span class="nb">sudo </span>docker rm &lt;container-name or container-id&gt; <span class="c">#删除容器</span>
+<span class="nv">$ </span><span class="nb">sudo </span>docker inspect &lt;container-name or container-id&gt; <span class="c">#显示容器相关信息</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+<h1 id="总结">总结</h1>
+<p>通过本帖子大家可以学会如何使用docker来配置深度学习的容器，以后可以在自己电脑上配置多个环境，想调哪个调哪个，可以说docker是玩转算法的大杀器。</p>
+
+<p>本博客之前几篇文章专注于环境的搭建，之后我想跟大家多讨论一些算法的原理和技术细节，请大家拭目以待。</p>
+
+
+                <hr style="visibility: hidden;">
+
+                <ul class="pager">
+                    
+                    <li class="previous">
+                        <a href="/2019/04/04/GAN/" data-toggle="tooltip" data-placement="top" title="深度学习进阶">
+                        Previous<br>
+                        <span>深度学习进阶</span>
+                        </a>
+                    </li>
+                    
+                    
+                </ul>
+
+
+                
+                <!-- disqus 评论框 start -->
+                <div class="comment">
+                    <div id="disqus_thread" class="disqus-thread"></div>
+                </div>
+                <!-- disqus 评论框 end -->
+                
+
+                
+            </div>  
+
+    <!-- Side Catalog Container -->
+        
+            <div class="
+                col-lg-2 col-lg-offset-0
+                visible-lg-block
+                sidebar-container
+                catalog-container">
+                <div class="side-catalog">
+                    <hr class="hidden-sm hidden-xs">
+                    <h5>
+                        <a class="catalog-toggle" href="#">CATALOG</a>
+                    </h5>
+                    <ul class="catalog-body"></ul>
+                </div>
+            </div>
+        
+
+    <!-- Sidebar Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+
+            </div>
+        </div>
+    </div>
+</article>
+
+
+
+
+
+
+
+
+
+
+
+    <!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <!-- SNS Link -->
+                
+
+
+<ul class="list-inline text-center">
+
+
+  
+  
+  
+  
+  
+  
+  <li>
+    <a target="_blank" href="https://github.com/theodore-zxd">
+      <span class="fa-stack fa-lg">
+        <i class="fa fa-circle fa-stack-2x"></i>
+        <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+      </span>
+    </a>
+  </li>
+  
+  
+</ul>
+		
+		<p style="font-size:15px;text-align:center;color:#939393;width:300px;margin:0 auto; padding:20px 0;">
+<a style="display:inline-block;text-decoration:none;height:20px;line-height:20px;color:#939393;font-size:14px;" target="_blank" href="http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=31010602003396" >
+		    <img src="/img/beian.png" style="float:none; "/>沪公网安备 31010602003396号</a>
+		    <br> 
+                    Copyright &copy; Xudong's Blog 2019
+                    <br>
+                    Powered by <a href="https://theodore-zxd.github.io">Xudong's Blog</a> |   
+                    <iframe
+                        style="margin-left: 2px; margin-bottom:-5px;"
+                        frameborder="0" scrolling="0" width="100px" height="20px"
+                        src="https://ghbtns.com/github-btn.html?user=theodore-zxd&repo=theodore-zxd.github.io&type=star&count=true" >
+                    </iframe>
+                </p>
+            </div>
+	</div>
+    </div>
+</footer>
+
+<!-- jQuery -->
+<script src="/js/jquery.min.js "></script>
+
+<!-- Bootstrap Core JavaScript -->
+<!-- Currently, only navbar scroll-down effect at desktop still depends on this -->
+<script src="/js/bootstrap.min.js "></script>
+
+<!-- Custom Theme JavaScript -->
+<script src="/js/hux-blog.min.js "></script>
+
+<!-- Service Worker -->
+
+<script src="/js/snackbar.js "></script>
+<script src="/js/sw-registration.js "></script>
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+
+<!--
+     Because of the native support for backtick-style fenced code blocks
+     right within the Markdown is landed in Github Pages,
+     From V1.6, There is no need for Highlight.js,
+     so Huxblog drops it officially.
+
+     - https://github.com/blog/2100-github-pages-now-faster-and-simpler-with-jekyll-3-0
+     - https://help.github.com/articles/creating-and-highlighting-code-blocks/
+     - https://github.com/jneen/rouge/wiki/list-of-supported-languages-and-lexers
+-->
+<!--
+    <script>
+        async("http://cdn.bootcss.com/highlight.js/8.6/highlight.min.js", function(){
+            hljs.initHighlightingOnLoad();
+        })
+    </script>
+    <link href="http://cdn.bootcss.com/highlight.js/8.6/styles/github.min.css" rel="stylesheet">
+-->
+
+
+
+
+
+<!--fastClick.js -->
+<script>
+    async("//cdnjs.cloudflare.com/ajax/libs/fastclick/1.0.6/fastclick.min.js", function(){
+        var $nav = document.querySelector("nav");
+        if($nav) FastClick.attach($nav);
+    })
+</script>
+
+
+<!-- Google Analytics -->
+
+<script>
+    // dynamic User by Hux
+    var _gaId = 'UA-138048750-1';
+    var _gaDomain = 'zxd-ai.com';
+
+    // Originial
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', _gaId, _gaDomain);
+    ga('send', 'pageview');
+</script>
+
+
+
+<!-- Baidu Tongji -->
+
+
+
+<!-- Side Catalog -->
+
+<script type="text/javascript">
+    function generateCatalog (selector) {
+
+        // interop with multilangual 
+        if ('' == 'true') {
+            _containerSelector = 'div.post-container.active'
+        } else {
+            _containerSelector = 'div.post-container'
+        }
+
+        // init
+        var P = $(_containerSelector),a,n,t,l,i,c;
+        a = P.find('h1,h2,h3,h4,h5,h6');
+
+        // clean
+        $(selector).html('')
+
+        // appending
+        a.each(function () {
+            n = $(this).prop('tagName').toLowerCase();
+            i = "#"+$(this).prop('id');
+            t = $(this).text();
+            c = $('<a href="'+i+'" rel="nofollow">'+t+'</a>');
+            l = $('<li class="'+n+'_nav"></li>').append(c);
+            $(selector).append(l);
+        });
+        return true;
+    }
+
+    generateCatalog(".catalog-body");
+
+    // toggle side catalog
+    $(".catalog-toggle").click((function(e){
+        e.preventDefault();
+        $('.side-catalog').toggleClass("fold")
+    }))
+
+    /*
+     * Doc: https://github.com/davist11/jQuery-One-Page-Nav
+     * Fork by Hux to support padding
+     */
+    async("/js/jquery.nav.js", function () {
+        $('.catalog-body').onePageNav({
+            currentClass: "active",
+            changeHash: !1,
+            easing: "swing",
+            filter: "",
+            scrollSpeed: 700,
+            scrollOffset: 0,
+            scrollThreshold: .2,
+            begin: null,
+            end: null,
+            scrollChange: null,
+            padding: 80
+        });
+    });
+</script>
+
+
+
+<!-- Multi-Lingual -->
+
+
+
+
+<!-- Image to hack wechat -->
+<img src="/img/icon_wechat.png" width="0" height="0" />
+<!-- Migrate from head to bottom, no longer block render and still work -->
+
+</body>
+
+</html>

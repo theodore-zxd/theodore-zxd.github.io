@@ -5,9 +5,198 @@
     <description>人工智障，机器算命</description>
     <link>http://localhost:4000/</link>
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml" />
-    <pubDate>Sat, 13 Apr 2019 16:41:47 +0800</pubDate>
-    <lastBuildDate>Sat, 13 Apr 2019 16:41:47 +0800</lastBuildDate>
+    <pubDate>Wed, 24 Apr 2019 17:12:41 +0800</pubDate>
+    <lastBuildDate>Wed, 24 Apr 2019 17:12:41 +0800</lastBuildDate>
     <generator>Jekyll v3.7.4</generator>
+    
+      <item>
+        <title>docker入门</title>
+        <description>&lt;h1 id=&quot;docker简介&quot;&gt;Docker简介&lt;/h1&gt;
+&lt;p&gt;深度学习甚至其他机器学习算法对于系统的环境是苛刻的，往往我们需要花大量的时间去完成一套算法的配置。但是当我们想切换另一套代码时，会发现它所要求的运行环境与前一套大相径庭。如果我们重新安装系统从头开始配置新的环境，那之前配置的那套环境又前功尽弃了。&lt;/p&gt;
+
+&lt;p&gt;所以我们本能的想到：是不是有一种方法，让多种系统环境存在于一台PC上呢？也许虚拟机是你第一种想到的方法。&lt;/p&gt;
+
+&lt;p&gt;一个系统装多个版本的虚拟机，不同虚拟机内配置不同的运行环境，是不是就能解决了这个问题？&lt;/p&gt;
+
+&lt;p&gt;虚拟机只能部分解决这类问题。用过虚拟机的同学可能会发现以下问题：觉得系统跑虚拟机时特别费劲，用笔记本的同学会发现本子发烫，虚拟机内应用反应慢一拍等等。另外更重要的一点就是，用&lt;strong&gt;虚拟机&lt;/strong&gt;跑深度学习，对于&lt;strong&gt;显卡的兼容性极差&lt;/strong&gt;，基本可以放弃使用虚拟机装CUDA了。&lt;/p&gt;
+
+&lt;p&gt;说到这里我们就要隆重介绍下容器——Docker。刚上手我们可以把他看做是&lt;strong&gt;“没有操作系统的虚拟机”&lt;/strong&gt;，也就是说容器可以与宿主机共享一个操作系统，共享CPU、RAM以及硬盘等。但是容器拥有独立的系统环境，因此可以保证部署独立的应用而不受宿主机的配置环境的影响。此外在一台机器上配置多个环境，在多种环境之间切换不同功能的算法，这在做研究时可以当做是一种杀手锏。
+&lt;img src=&quot;/img/in-post/docker/fig1.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;本文就从安装和配置开始教大家如何使用docker和用它怎么搭建深度学习算法运行环境，最后实现用docker搭建深度学习的推荐系统Neural Factorization Machine.&lt;/p&gt;
+
+&lt;h1 id=&quot;本机docker宿主机系统环境&quot;&gt;本机（docker宿主机）系统环境&lt;/h1&gt;
+&lt;p&gt;&lt;strong&gt;（1）64位 ubuntu16.04 **
+**（2）独立NVIDIA显卡&lt;/strong&gt;
+同学们要注意哦，由于有些笔记本包含独立显卡和集成显卡，里面涉及到禁用集成显卡的问题，比较复杂。这里我们就用台式机的独立显卡来作为硬件环境进行研究。&lt;/p&gt;
+
+&lt;h1 id=&quot;安装docker和nvidia-docker&quot;&gt;安装docker和nvidia-docker&lt;/h1&gt;
+&lt;p&gt;使用docker来配置深度学习环境的容器需要安装英伟达的插件，因为普通的docker容器里是没有显卡驱动的。而官方的docker安装指南和nvidia插件安装指南可以参考以下两个链接。&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;docker：&lt;/em&gt;
+&lt;a href=&quot;https://docs.docker.com/install/linux/docker-ce/ubuntu/#prerequisites&quot;&gt;https://docs.docker.com/install/linux/docker-ce/ubuntu/#prerequisites&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;nvidia-docker:&lt;/em&gt;
+&lt;a href=&quot;https://devblogs.nvidia.com/nvidia-docker-gpu-server-application-deployment-made-easy/&quot;&gt;https://devblogs.nvidia.com/nvidia-docker-gpu-server-application-deployment-made-easy/&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;不想看官方文档的同学可以看本节总结的以下几个步骤。当然在宿主机安装docker之前需要确认自己的电脑已经拥有nvidia显卡的完整驱动，用&lt;code class=&quot;highlighter-rouge&quot;&gt;nvidia-smi&lt;/code&gt;这句命令来验证是否安装完整nvidia驱动。&lt;/p&gt;
+
+&lt;h2 id=&quot;1如果本机之前安装过docker需要卸载旧docker&quot;&gt;（1）如果本机之前安装过docker，需要卸载旧docker：&lt;/h2&gt;
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;rouge-gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;rouge-code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;apt-get remove docker docker-engine docker.io containerd runc
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;h2 id=&quot;2安装docker-ce-社区版本community-edition的docker&quot;&gt;（2）安装Docker CE 社区版本（Community Edition）的docker&lt;/h2&gt;
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;rouge-gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+2
+3
+4
+5
+6
+7
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;rouge-code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;apt-get update
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;apt-get install apt-transport-https ca-certificates curl gnupg-agent  software-properties-common
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;curl &lt;span class=&quot;nt&quot;&gt;-fsSL&lt;/span&gt; https://download.docker.com/linux/ubuntu/gpg | &lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;apt-key add -
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;apt-key fingerprint 0EBFCD88
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;add-apt-repository &lt;span class=&quot;s2&quot;&gt;&quot;deb [arch=amd64] https://download.docker.com/linux/ubuntu &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;$(&lt;/span&gt;lsb_release &lt;span class=&quot;nt&quot;&gt;-cs&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt; stable&quot;&lt;/span&gt;
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;apt-get update
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;apt-get install docker-ce docker-ce-cli containerd.io
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;完成安装docker，然后可以在终端输入&lt;/p&gt;
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;rouge-gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;rouge-code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;docker run hello-world
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;来检验安装，如果出现以下界面，则说明docker安装成功。
+&lt;img src=&quot;/img/in-post/docker/fig2.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;3安装nvidia-docker的插件&quot;&gt;（3）安装nvidia-docker的插件&lt;/h2&gt;
+&lt;p&gt;如果系统之前安装过nvidia-docker插件的话，需要清除下：&lt;/p&gt;
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;rouge-gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+2
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;rouge-code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;docker volume &lt;span class=&quot;nb&quot;&gt;ls&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-q&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;driver&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;nvidia-docker | xargs &lt;span class=&quot;nt&quot;&gt;-r&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-I&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;{}&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-n1&lt;/span&gt; docker ps &lt;span class=&quot;nt&quot;&gt;-q&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-a&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;volume&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;={}&lt;/span&gt; | xargs &lt;span class=&quot;nt&quot;&gt;-r&lt;/span&gt; docker rm &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt;
+&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;apt-get purge &lt;span class=&quot;nt&quot;&gt;-y&lt;/span&gt; nvidia-docker
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;没有装过的话，我们正式开始安装nvidia插件&lt;/p&gt;
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;rouge-gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;rouge-code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;c&quot;&gt;# Add the package repositories&lt;/span&gt;
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;curl &lt;span class=&quot;nt&quot;&gt;-s&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-L&lt;/span&gt; https://nvidia.github.io/nvidia-docker/gpgkey |   &lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;apt-key add -
+&lt;span class=&quot;nv&quot;&gt;$ distribution&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;$(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;.&lt;/span&gt; /etc/os-release&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$ID$VERSION_ID&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;curl &lt;span class=&quot;nt&quot;&gt;-s&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-L&lt;/span&gt; https://nvidia.github.io/nvidia-docker/&lt;span class=&quot;nv&quot;&gt;$distribution&lt;/span&gt;/nvidia-docker.list | &lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;tee /etc/apt/sources.list.d/nvidia-docker.list
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;apt-get update
+
+&lt;span class=&quot;c&quot;&gt;# Install nvidia-docker2 and reload the Docker daemon configuration&lt;/span&gt;
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;apt-get install &lt;span class=&quot;nt&quot;&gt;-y&lt;/span&gt; nvidia-docker2
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;pkill &lt;span class=&quot;nt&quot;&gt;-SIGHUP&lt;/span&gt; dockerd
+
+&lt;span class=&quot;c&quot;&gt;# Test nvidia-smi with the latest official CUDA image&lt;/span&gt;
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;docker run &lt;span class=&quot;nt&quot;&gt;--runtime&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;nvidia &lt;span class=&quot;nt&quot;&gt;--rm&lt;/span&gt; nvidia/cuda:9.0-base nvidia-smi
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;最后出现以下类似内容说明nvidia-docker已经安装成功了。
+&lt;img src=&quot;/img/in-post/docker/fig3.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;h1 id=&quot;创建容器下的深度学习运行环境&quot;&gt;创建容器下的深度学习运行环境&lt;/h1&gt;
+&lt;h2 id=&quot;镜像image和容器container&quot;&gt;镜像Image和容器Container&lt;/h2&gt;
+&lt;p&gt;在学习使用docker之前，我们应该知道两个概念：&lt;strong&gt;镜像Image&lt;/strong&gt;和&lt;strong&gt;容器Container&lt;/strong&gt;。&lt;/p&gt;
+
+&lt;p&gt;镜像image其实通俗的理解为&lt;strong&gt;“系统安装盘”&lt;/strong&gt;，有个安装盘是ubuntu16.04有的安装盘是ubuntu18.04，有的安装盘里已经装好了tensorflow，有的安装盘里本身就有CUDA8.0等等。而容器则可以通俗理解为&lt;strong&gt;“安装好的系统”&lt;/strong&gt;，一个系统盘可以装好几个系统，一台电脑上也可以装好几个不同的系统，正如下图所示。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/img/in-post/docker/fig4.png&quot; alt=&quot;&quot; width=&quot;400px&quot; height=&quot;230px&quot; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;拉取镜像&quot;&gt;拉取镜像&lt;/h2&gt;
+&lt;p&gt;首先我们可以使用&lt;code class=&quot;highlighter-rouge&quot;&gt;sudo docker images&lt;/code&gt;来查看自己已经安装了哪些镜像，如下图所示。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/img/in-post/docker/fig5.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;可以看到我除了之前验证docker安装时拉取的hello-world和nvidia/cuda:9.0外，还拉取了其他的一些镜像。例如其中的tensorflow/tensorflow:1.12.0-devel-gpu系统镜像，我们就可以通过&lt;code class=&quot;highlighter-rouge&quot;&gt;sudo docker image pull tensorflow/tensorflow:1.12.0-devel-gpu&lt;/code&gt;来下载。&lt;/p&gt;
+
+&lt;p&gt;那么我们怎么知道有哪些镜像可以挑选呢？这里就必须介绍docker hub官网了&lt;a href=&quot;https://hub.docker.com/&quot;&gt;https://hub.docker.com/&lt;/a&gt; ，在这里我们可以选我们想要的哪些镜像，然后通过命令的方式&lt;code class=&quot;highlighter-rouge&quot;&gt;sudo docker image pull xxxx&lt;/code&gt;来下载。像tensorflow、cuda之类的应用都有官方镜像库，当然我们也可以挑选有些达人自己做的镜像，这么一想docker hub就有点像github了。&lt;/p&gt;
+
+&lt;h2 id=&quot;实例化容器&quot;&gt;实例化容器&lt;/h2&gt;
+&lt;p&gt;这里我们就以cuda8.0-cudnn5-devel-ubuntu16.04这个镜像为例子，搭建一套深度学习的开发环境。&lt;/p&gt;
+
+&lt;p&gt;首先我们将这个镜像实例化为容器:&lt;/p&gt;
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;rouge-gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;rouge-code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;nvidia-docker container run &lt;span class=&quot;nt&quot;&gt;-it&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;--name&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;test &lt;/span&gt;nvidia/cuda:8.0-cudnn5-devel-ubuntu16.04 /bin/bash
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;然后我们具体解释下这个命令的每个部分：
+&lt;strong&gt;nvidia-&lt;/strong&gt;这个前缀是必须的，是用来调用nvidia插件的。命令中的-it 参数是将容器和宿主机的终端连接起来的指令；–name后面是给这个容器取的名字，这个例子中容器叫做test；最后&lt;code class=&quot;highlighter-rouge&quot;&gt;/bin/bash&lt;/code&gt;是打开了容器的终端。运行后的界面如下图所示：
+&lt;img src=&quot;/img/in-post/docker/fig6.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;这里我们可以发现，shell的提示符已经发生了变化，如上图的&lt;code class=&quot;highlighter-rouge&quot;&gt;root@b8972adc4506:&lt;/code&gt;，这说明我们现在已经在终端内部了，@后的这串字符串就是这个容器的唯一ID。&lt;/p&gt;
+
+&lt;p&gt;现在我们就可以把这个容器当做是一般的ubuntu环境来用就行了。但是有两点需要注意：
+**1. 容器始终都是拥有root权限，因此不需要在某些命令前面打&lt;code class=&quot;highlighter-rouge&quot;&gt;sudo&lt;/code&gt;&lt;/p&gt;
+&lt;ol&gt;
+  &lt;li&gt;容器可以看做是没有显示器的主机，没有UI界面，因此无法使用一些需要调用UI的应用，诸如gedit等。（文本输入可用vim代替）
+**&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h2 id=&quot;使用容器配置深度学习算法环境&quot;&gt;使用容器配置深度学习算法环境&lt;/h2&gt;
+&lt;p&gt;在刚才创建的这个容器里还没有安装python和tensorflow，下面几步骤使用pip安装上述两者及其他一些拓展包。&lt;/p&gt;
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;rouge-gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+2
+3
+4
+5
+6
+7
+8
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;rouge-code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;apt-get update &lt;span class=&quot;c&quot;&gt;#更新&lt;/span&gt;
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;apt-get install python &lt;span class=&quot;c&quot;&gt;#安装python2.7&lt;/span&gt;
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;apt-get install python-pip &lt;span class=&quot;c&quot;&gt;#安装pip&lt;/span&gt;
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;pip install tensorflow-gpu&lt;span class=&quot;o&quot;&gt;==&lt;/span&gt;1.2.1 &lt;span class=&quot;c&quot;&gt;#安装gpu版本tensorflow1.2.1&lt;/span&gt;
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;apt-get install git &lt;span class=&quot;c&quot;&gt;#安装git&lt;/span&gt;
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;git clone https://github.com/theodore-zxd/neural_factorization_machine.git &lt;span class=&quot;c&quot;&gt;#这是一个应用深度学习实现推荐系统的应用&lt;/span&gt;
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;pip install sklearn &lt;span class=&quot;c&quot;&gt;# 安装其他一些需要的拓展库&lt;/span&gt;
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;python NeuralFM.py &lt;span class=&quot;nt&quot;&gt;--dataset&lt;/span&gt; frappe &lt;span class=&quot;nt&quot;&gt;--hidden_factor&lt;/span&gt; 64 &lt;span class=&quot;nt&quot;&gt;--layers&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;64] &lt;span class=&quot;nt&quot;&gt;--keep_prob&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;0.8,0.5] &lt;span class=&quot;nt&quot;&gt;--loss_type&lt;/span&gt; square_loss &lt;span class=&quot;nt&quot;&gt;--activation&lt;/span&gt; relu &lt;span class=&quot;nt&quot;&gt;--pretrain&lt;/span&gt; 0 &lt;span class=&quot;nt&quot;&gt;--optimizer&lt;/span&gt; AdagradOptimizer &lt;span class=&quot;nt&quot;&gt;--lr&lt;/span&gt; 0.05 &lt;span class=&quot;nt&quot;&gt;--batch_norm&lt;/span&gt; 1 &lt;span class=&quot;nt&quot;&gt;--verbose&lt;/span&gt; 1 &lt;span class=&quot;nt&quot;&gt;--early_stop&lt;/span&gt; 1 &lt;span class=&quot;nt&quot;&gt;--epoch&lt;/span&gt; 200 &lt;span class=&quot;c&quot;&gt;#最后运行深度学习推荐系统NFM的示例代码&lt;/span&gt;
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;如果运行结果如下图类似，那么恭喜你完成了配置，撒花！
+&lt;img src=&quot;/img/in-post/docker/fig7.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;h1 id=&quot;docker常用命令&quot;&gt;docker常用命令&lt;/h1&gt;
+&lt;p&gt;&lt;strong&gt;以下命令如果需要调用显卡，需要在&lt;code class=&quot;highlighter-rouge&quot;&gt;docker&lt;/code&gt;前添加&lt;code class=&quot;highlighter-rouge&quot;&gt;nvidia-&lt;/code&gt;前缀。&lt;/strong&gt;&lt;/p&gt;
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;rouge-gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+2
+3
+4
+5
+6
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;rouge-code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;docker container &lt;span class=&quot;nb&quot;&gt;ls&lt;/span&gt; &lt;span class=&quot;c&quot;&gt;#列出所有正在运行的容器，后面跟上-a可显示所有容器&lt;/span&gt;
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;docker container &lt;span class=&quot;nb&quot;&gt;exec&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-it&lt;/span&gt; &amp;lt;container-name or container-id&amp;gt; /bin/bash &lt;span class=&quot;c&quot;&gt;#开启容器的一个shell &lt;/span&gt;
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;docker container stop &amp;lt;container-name or container-id&amp;gt; &lt;span class=&quot;c&quot;&gt;#停止容器&lt;/span&gt;
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;docker start &amp;lt;container-name or container-id&amp;gt; &lt;span class=&quot;c&quot;&gt;#开启容器&lt;/span&gt;
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;docker rm &amp;lt;container-name or container-id&amp;gt; &lt;span class=&quot;c&quot;&gt;#删除容器&lt;/span&gt;
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;docker inspect &amp;lt;container-name or container-id&amp;gt; &lt;span class=&quot;c&quot;&gt;#显示容器相关信息&lt;/span&gt;
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;h1 id=&quot;总结&quot;&gt;总结&lt;/h1&gt;
+&lt;p&gt;通过本帖子大家可以学会如何使用docker来配置深度学习的容器，以后可以在自己电脑上配置多个环境，想调哪个调哪个，可以说docker是玩转算法的大杀器。&lt;/p&gt;
+
+&lt;p&gt;本博客之前几篇文章专注于环境的搭建，之后我想跟大家多讨论一些算法的原理和技术细节，请大家拭目以待。&lt;/p&gt;
+</description>
+        <pubDate>Wed, 24 Apr 2019 00:00:00 +0800</pubDate>
+        <link>http://localhost:4000/2019/04/24/docker_deep_learning/</link>
+        <guid isPermaLink="true">http://localhost:4000/2019/04/24/docker_deep_learning/</guid>
+        
+        <category>docker</category>
+        
+        <category>深度学习</category>
+        
+        <category>推荐系统</category>
+        
+        
+      </item>
     
       <item>
         <title>深度学习进阶</title>
