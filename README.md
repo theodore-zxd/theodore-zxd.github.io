@@ -9,7 +9,5 @@
 
 (4) docker入门](http://www.zxd-ai.com/2019/04/24/docker_deep_learning/): Demonstration of using docker for building deep learning environments. 
 
-![](/img/readme_bg.png)
-
-
-
+## Preview:
+![](/img/readme_bg.png){:width=300px height=1500px}
