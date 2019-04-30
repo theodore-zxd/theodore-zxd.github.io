@@ -5,8 +5,8 @@
     <description>人工智障，机器算命</description>
     <link>http://localhost:4000/</link>
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml" />
-    <pubDate>Fri, 26 Apr 2019 15:42:20 +0800</pubDate>
-    <lastBuildDate>Fri, 26 Apr 2019 15:42:20 +0800</lastBuildDate>
+    <pubDate>Tue, 30 Apr 2019 21:10:05 +0800</pubDate>
+    <lastBuildDate>Tue, 30 Apr 2019 21:10:05 +0800</lastBuildDate>
     <generator>Jekyll v3.7.4</generator>
     
       <item>
@@ -239,9 +239,7 @@ options nouveau &lt;span class=&quot;nv&quot;&gt;modeset&lt;/span&gt;&lt;span cl
 &lt;p&gt;然后保存并退出。继续输入&lt;/p&gt;
 &lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;rouge-gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
 2
-3
-&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;rouge-code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;echo &lt;/span&gt;options nouveau &lt;span class=&quot;nv&quot;&gt;modeset&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;0
-&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;tee &lt;span class=&quot;nt&quot;&gt;-a&lt;/span&gt; /etc/modprobe.d/nouveau-kms.conf
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;rouge-code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;echo &lt;/span&gt;options nouveau &lt;span class=&quot;nv&quot;&gt;modeset&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;0 | &lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;tee &lt;span class=&quot;nt&quot;&gt;-a&lt;/span&gt; /etc/modprobe.d/nouveau-kms.conf
 &lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;update-initramfs &lt;span class=&quot;nt&quot;&gt;-u&lt;/span&gt;
 &lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 &lt;p&gt;重启&lt;code class=&quot;highlighter-rouge&quot;&gt;$ reboot&lt;/code&gt;&lt;/p&gt;

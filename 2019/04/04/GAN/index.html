@@ -276,9 +276,7 @@ options nouveau <span class="nv">modeset</span><span class="o">=</span>0
 <p>然后保存并退出。继续输入</p>
 <div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
-3
-</pre></td><td class="rouge-code"><pre><span class="nv">$ </span><span class="nb">echo </span>options nouveau <span class="nv">modeset</span><span class="o">=</span>0
-<span class="nv">$ </span><span class="nb">sudo </span>tee <span class="nt">-a</span> /etc/modprobe.d/nouveau-kms.conf
+</pre></td><td class="rouge-code"><pre><span class="nv">$ </span><span class="nb">echo </span>options nouveau <span class="nv">modeset</span><span class="o">=</span>0 | <span class="nb">sudo </span>tee <span class="nt">-a</span> /etc/modprobe.d/nouveau-kms.conf
 <span class="nv">$ </span><span class="nb">sudo </span>update-initramfs <span class="nt">-u</span>
 </pre></td></tr></tbody></table></code></pre></div></div>
 <p>重启<code class="highlighter-rouge">$ reboot</code></p>
